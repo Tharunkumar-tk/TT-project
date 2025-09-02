@@ -1,30 +1,38 @@
-import React from 'react';
-import { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useGame } from '../../contexts/GameContext';
+import OnboardingSurvey from '../../components/Onboarding/OnboardingSurvey';
 import Card from '../../components/UI/Card';
 import ProgressBar from '../../components/UI/ProgressBar';
 import Button from '../../components/UI/Button';
-import { Trophy, Zap, Calendar, Star, Target, Edit, Save, X, Upload } from 'lucide-react';
+import { Trophy, Zap, Calendar, Star, Target, Edit, Save, Upload, Camera, Eye, EyeOff } from 'lucide-react';
 
 const AthleteProfile: React.FC = () => {
   const { user, updateUser } = useAuth();
   const { badges } = useGame();
   const [isEditing, setIsEditing] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showAllProgress, setShowAllProgress] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const heightProofRef = useRef<HTMLInputElement>(null);
+  
   const [editForm, setEditForm] = useState({
     name: user?.name || '',
-    age: '',
-    bio: '',
-    height: '',
-    weight: '',
-    sport: ''
+    height: user?.height || '',
+    weight: user?.weight || ''
   });
-  const [proofImages, setProofImages] = useState<{
-    height?: File;
-    weight?: File;
-  }>({});
 
   if (!user) return null;
+
+  // Check if profile is incomplete and show survey
+  if (!user.profileComplete) {
+    return (
+      <OnboardingSurvey 
+        onComplete={() => setShowOnboarding(false)}
+        mandatory={true}
+      />
+    );
+  }
 
   const level = user.level || 1;
   const xpForNextLevel = level * 300;
@@ -32,19 +40,44 @@ const AthleteProfile: React.FC = () => {
 
   const unlockedBadges = badges.filter(badge => badge.unlocked);
   const progressBadges = badges.filter(badge => !badge.unlocked && badge.progress > 0);
+  const displayedProgressBadges = showAllProgress ? progressBadges : progressBadges.slice(0, 5);
 
   const handleSaveProfile = () => {
-    updateUser({ name: editForm.name });
+    updateUser({ 
+      name: editForm.name,
+      height: editForm.height,
+      weight: editForm.weight
+    });
     setIsEditing(false);
   };
 
-  const handleProofUpload = (type: 'height' | 'weight', file: File) => {
-    setProofImages(prev => ({ ...prev, [type]: file }));
+  const handleAvatarUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        updateUser({ avatar: result });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleHeightProofUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        updateUser({ heightProof: result });
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <h1 className="text-3xl font-bold text-white">Profile</h1>
         <Button 
           variant={isEditing ? "success" : "secondary"}
@@ -59,11 +92,29 @@ const AthleteProfile: React.FC = () => {
         {/* Profile Card */}
         <Card className="lg:col-span-1">
           <div className="text-center">
-            <img
-              src={user.avatar}
-              alt={user.name}
-              className="w-24 h-24 rounded-full mx-auto mb-4 border-4 border-purple-500"
-            />
+            <div className="relative inline-block mb-4">
+              <img
+                src={user.avatar}
+                alt={user.name}
+                className="w-24 h-24 rounded-full border-4 border-purple-500"
+              />
+              {isEditing && (
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="absolute bottom-0 right-0 bg-purple-600 hover:bg-purple-700 rounded-full p-2 transition-colors"
+                >
+                  <Camera className="w-4 h-4 text-white" />
+                </button>
+              )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleAvatarUpload}
+                className="hidden"
+              />
+            </div>
+
             {isEditing ? (
               <div className="space-y-3 mb-4">
                 <input
@@ -73,35 +124,21 @@ const AthleteProfile: React.FC = () => {
                   className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-center"
                   placeholder="Full Name"
                 />
-                <input
-                  type="number"
-                  value={editForm.age}
-                  onChange={(e) => setEditForm(prev => ({ ...prev, age: e.target.value }))}
-                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-center"
-                  placeholder="Age"
-                />
-                <textarea
-                  value={editForm.bio}
-                  onChange={(e) => setEditForm(prev => ({ ...prev, bio: e.target.value }))}
-                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-center resize-none"
-                  placeholder="Bio"
-                  rows={2}
-                />
-                <input
-                  type="text"
-                  value={editForm.sport}
-                  onChange={(e) => setEditForm(prev => ({ ...prev, sport: e.target.value }))}
-                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-center"
-                  placeholder="Favorite Sport"
-                />
               </div>
             ) : (
               <div className="mb-4">
                 <h2 className="text-2xl font-bold text-white mb-1">{user.name}</h2>
                 <p className="text-gray-400 mb-2">{user.email}</p>
-                {editForm.age && <p className="text-gray-400 text-sm">Age: {editForm.age}</p>}
-                {editForm.bio && <p className="text-gray-300 text-sm italic mt-2">"{editForm.bio}"</p>}
-                {editForm.sport && <p className="text-purple-400 text-sm mt-1">🏆 {editForm.sport}</p>}
+                {user.gender && <p className="text-gray-400 text-sm">Gender: {user.gender}</p>}
+                {user.mobile && <p className="text-gray-400 text-sm">Mobile: {user.mobile}</p>}
+                {user.state && user.district && (
+                  <p className="text-purple-400 text-sm mt-1">📍 {user.district}, {user.state}</p>
+                )}
+                {user.achievements && (
+                  <p className="text-gray-300 text-sm italic mt-2 bg-gray-700 p-2 rounded">
+                    "{user.achievements}"
+                  </p>
+                )}
               </div>
             )}
             
@@ -121,7 +158,7 @@ const AthleteProfile: React.FC = () => {
               </p>
             </div>
 
-            <div className="grid grid-cols-3 gap-3 text-center">
+            <div className="grid grid-cols-3 gap-3 text-center mb-6">
               <div className="bg-yellow-600/20 rounded-lg p-3">
                 <Zap className="w-5 h-5 text-yellow-400 mx-auto mb-1" />
                 <div className="text-yellow-400 font-bold">{user.xp}</div>
@@ -138,67 +175,73 @@ const AthleteProfile: React.FC = () => {
                 <div className="text-xs text-gray-400">Day Streak</div>
               </div>
             </div>
-          </div>
 
-          {/* Physical Stats Section */}
-          {isEditing && (
-            <div className="mt-6 pt-6 border-t border-gray-700">
-              <h3 className="text-lg font-bold text-white mb-4">Physical Stats</h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm text-gray-400 mb-2">Height (cm)</label>
-                  <div className="flex gap-2">
+            {/* Physical Stats */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-bold text-white">Physical Stats</h3>
+              
+              {/* Height */}
+              <div className="bg-gray-700 rounded-lg p-3">
+                <label className="block text-sm text-gray-400 mb-2">Height (cm)</label>
+                {isEditing ? (
+                  <div className="space-y-2">
                     <input
                       type="number"
                       value={editForm.height}
                       onChange={(e) => setEditForm(prev => ({ ...prev, height: e.target.value }))}
-                      className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                      className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded text-white"
                       placeholder="175"
                     />
-                    <label className="bg-gray-700 hover:bg-gray-600 px-3 py-2 rounded-lg cursor-pointer flex items-center">
-                      <Upload className="w-4 h-4 text-gray-400" />
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => e.target.files?.[0] && handleProofUpload('height', e.target.files[0])}
-                        className="hidden"
-                      />
-                    </label>
-                  </div>
-                  {proofImages.height && (
-                    <p className="text-green-400 text-xs mt-1">✓ Proof image uploaded</p>
-                  )}
-                  <p className="text-gray-500 text-xs mt-1">Upload measuring tape photo for verification</p>
-                </div>
-
-                <div>
-                  <label className="block text-sm text-gray-400 mb-2">Weight (kg)</label>
-                  <div className="flex gap-2">
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => heightProofRef.current?.click()}
+                        className="flex-1 bg-purple-600 hover:bg-purple-700 px-3 py-2 rounded text-white text-sm flex items-center justify-center"
+                      >
+                        <Upload className="w-4 h-4 mr-1" />
+                        Upload Proof
+                      </button>
+                    </div>
                     <input
-                      type="number"
-                      value={editForm.weight}
-                      onChange={(e) => setEditForm(prev => ({ ...prev, weight: e.target.value }))}
-                      className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
-                      placeholder="70"
+                      ref={heightProofRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleHeightProofUpload}
+                      className="hidden"
                     />
-                    <label className="bg-gray-700 hover:bg-gray-600 px-3 py-2 rounded-lg cursor-pointer flex items-center">
-                      <Upload className="w-4 h-4 text-gray-400" />
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => e.target.files?.[0] && handleProofUpload('weight', e.target.files[0])}
-                        className="hidden"
-                      />
-                    </label>
+                    {user.heightProof && (
+                      <p className="text-green-400 text-xs">✓ Proof image uploaded</p>
+                    )}
+                    <p className="text-gray-500 text-xs">
+                      Upload full-body photo touching ground for verification
+                    </p>
                   </div>
-                  {proofImages.weight && (
-                    <p className="text-green-400 text-xs mt-1">✓ Proof image uploaded</p>
-                  )}
-                  <p className="text-gray-500 text-xs mt-1">Upload scale photo for verification</p>
-                </div>
+                ) : (
+                  <div className="text-white font-medium">
+                    {user.height ? `${user.height} cm` : 'Not set'}
+                    {user.heightProof && <span className="text-green-400 ml-2">✓</span>}
+                  </div>
+                )}
+              </div>
+
+              {/* Weight */}
+              <div className="bg-gray-700 rounded-lg p-3">
+                <label className="block text-sm text-gray-400 mb-2">Weight (kg)</label>
+                {isEditing ? (
+                  <input
+                    type="number"
+                    value={editForm.weight}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, weight: e.target.value }))}
+                    className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded text-white"
+                    placeholder="70"
+                  />
+                ) : (
+                  <div className="text-white font-medium">
+                    {user.weight ? `${user.weight} kg` : 'Not set'}
+                  </div>
+                )}
               </div>
             </div>
-          )}
+          </div>
         </Card>
 
         {/* Stats and Achievements */}
@@ -220,10 +263,10 @@ const AthleteProfile: React.FC = () => {
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-yellow-400">#{Math.floor(Math.random() * 50) + 1}</div>
-                <div className="text-sm text-gray-400">National Rank</div>
+                <div className="text-sm text-gray-400">District Rank</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-orange-400">12</div>
+                <div className="text-2xl font-bold text-orange-400">{user.streak}</div>
                 <div className="text-sm text-gray-400">Best Streak</div>
               </div>
             </div>
@@ -260,9 +303,29 @@ const AthleteProfile: React.FC = () => {
 
             {progressBadges.length > 0 && (
               <div>
-                <h4 className="text-white font-medium mb-3">In Progress</h4>
+                <div className="flex justify-between items-center mb-3">
+                  <h4 className="text-white font-medium">In Progress</h4>
+                  {progressBadges.length > 5 && (
+                    <button
+                      onClick={() => setShowAllProgress(!showAllProgress)}
+                      className="text-purple-400 hover:text-purple-300 text-sm flex items-center"
+                    >
+                      {showAllProgress ? (
+                        <>
+                          <EyeOff className="w-4 h-4 mr-1" />
+                          Show Less
+                        </>
+                      ) : (
+                        <>
+                          <Eye className="w-4 h-4 mr-1" />
+                          View More ({progressBadges.length - 5})
+                        </>
+                      )}
+                    </button>
+                  )}
+                </div>
                 <div className="space-y-3">
-                  {progressBadges.map((badge) => (
+                  {displayedProgressBadges.map((badge) => (
                     <div key={badge.id} className="flex items-center space-x-3 bg-gray-700 rounded-lg p-3">
                       <div className="text-xl opacity-50">{badge.icon}</div>
                       <div className="flex-1">
@@ -293,7 +356,7 @@ const AthleteProfile: React.FC = () => {
             <div className="space-y-3">
               {[
                 { action: 'Completed Jump Test', reward: '+50 XP', time: '2 hours ago', icon: '🦘' },
-                { action: 'Unlocked First Leap Badge', reward: '+10 🪙', time: '1 day ago', icon: '🏆' },
+                { action: 'Profile Setup Bonus', reward: '+100 🪙', time: '1 day ago', icon: '🎁' },
                 { action: 'Daily Challenge Complete', reward: '+25 XP', time: '2 days ago', icon: '✅' },
                 { action: 'Uploaded Push-up Video', reward: '+30 XP', time: '3 days ago', icon: '💪' },
               ].map((activity, index) => (
@@ -310,6 +373,13 @@ const AthleteProfile: React.FC = () => {
           </Card>
         </div>
       </div>
+
+      {showOnboarding && (
+        <OnboardingSurvey 
+          onComplete={() => setShowOnboarding(false)}
+          mandatory={true}
+        />
+      )}
     </div>
   );
 };

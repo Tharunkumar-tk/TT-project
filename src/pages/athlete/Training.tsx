@@ -2,18 +2,20 @@ import React, { useState } from 'react';
 import { useGame } from '../../contexts/GameContext';
 import Card from '../../components/UI/Card';
 import Button from '../../components/UI/Button';
-import { Play, Clock, User, BookOpen, Lightbulb, MessageSquare } from 'lucide-react';
+import { Play, Clock, User, BookOpen, Lightbulb, MessageSquare, X } from 'lucide-react';
 
-type TrainingCategory = 'all' | 'strength' | 'endurance' | 'flexibility' | 'recovery';
+type TrainingCategory = 'all' | 'strength' | 'endurance' | 'flexibility' | 'recovery' | 'speed';
 
 const Training: React.FC = () => {
   const { trainingVideos } = useGame();
   const [activeCategory, setActiveCategory] = useState<TrainingCategory>('all');
+  const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
 
   const categories = [
     { id: 'all' as TrainingCategory, name: 'All Videos', icon: BookOpen, color: 'gray' },
     { id: 'strength' as TrainingCategory, name: 'Strength', icon: '💪', color: 'red' },
     { id: 'endurance' as TrainingCategory, name: 'Endurance', icon: '🏃', color: 'blue' },
+    { id: 'speed' as TrainingCategory, name: 'Speed', icon: '⚡', color: 'yellow' },
     { id: 'flexibility' as TrainingCategory, name: 'Flexibility', icon: '🤸', color: 'green' },
     { id: 'recovery' as TrainingCategory, name: 'Recovery', icon: '😌', color: 'purple' },
   ];
@@ -21,6 +23,8 @@ const Training: React.FC = () => {
   const filteredVideos = activeCategory === 'all' 
     ? trainingVideos 
     : trainingVideos.filter(v => v.category === activeCategory);
+
+  const selectedVideoData = trainingVideos.find(v => v.id === selectedVideo);
 
   const tips = [
     {
@@ -47,20 +51,20 @@ const Training: React.FC = () => {
 
   const coachAdvice = [
     {
-      coach: 'Coach Sarah',
-      avatar: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=100',
+      coach: 'Coach Arjun',
+      avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100',
       advice: 'Consistency beats perfection. Show up every day, even if it\'s just for 10 minutes.',
       specialty: 'Strength Training'
     },
     {
-      coach: 'Coach Mike',
-      avatar: 'https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=100',
+      coach: 'Coach Priya',
+      avatar: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=100',
       advice: 'Listen to your body. Push yourself, but know when to rest to prevent injury.',
       specialty: 'Endurance Coaching'
     },
     {
-      coach: 'Coach Emma',
-      avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100',
+      coach: 'Coach Meena',
+      avatar: 'https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=100',
       advice: 'Flexibility is often overlooked but crucial for athletic performance and injury prevention.',
       specialty: 'Flexibility & Recovery'
     }
@@ -107,7 +111,11 @@ const Training: React.FC = () => {
             
             <div className="grid md:grid-cols-2 gap-4">
               {filteredVideos.map((video) => (
-                <div key={video.id} className="bg-gray-700 rounded-lg overflow-hidden hover:bg-gray-650 transition-colors cursor-pointer">
+                <div 
+                  key={video.id} 
+                  className="bg-gray-700 rounded-lg overflow-hidden hover:bg-gray-650 transition-colors cursor-pointer"
+                  onClick={() => setSelectedVideo(video.id)}
+                >
                   <div className="relative">
                     <img 
                       src={video.thumbnail} 
@@ -132,6 +140,7 @@ const Training: React.FC = () => {
                       <span className={`text-xs px-2 py-1 rounded-full ${
                         video.category === 'strength' ? 'bg-red-600/20 text-red-400' :
                         video.category === 'endurance' ? 'bg-blue-600/20 text-blue-400' :
+                        video.category === 'speed' ? 'bg-yellow-600/20 text-yellow-400' :
                         video.category === 'flexibility' ? 'bg-green-600/20 text-green-400' :
                         'bg-purple-600/20 text-purple-400'
                       }`}>
@@ -213,6 +222,58 @@ const Training: React.FC = () => {
           </Card>
         </div>
       </div>
+
+      {/* Video Player Modal */}
+      {selectedVideo && selectedVideoData && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800 rounded-xl border border-gray-700 w-full max-w-4xl max-h-[90vh] overflow-hidden">
+            <div className="flex justify-between items-center p-4 border-b border-gray-700">
+              <h3 className="text-xl font-bold text-white">{selectedVideoData.title}</h3>
+              <button
+                onClick={() => setSelectedVideo(null)}
+                className="text-gray-400 hover:text-white"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            <div className="p-4">
+              <div className="aspect-video bg-black rounded-lg overflow-hidden mb-4">
+                <iframe
+                  width="100%"
+                  height="100%"
+                  src={`https://www.youtube.com/embed/${selectedVideoData.youtubeId}`}
+                  title={selectedVideoData.title}
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-1">
+                    <User className="w-4 h-4 text-gray-400" />
+                    <span className="text-gray-300">{selectedVideoData.instructor}</span>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <Clock className="w-4 h-4 text-gray-400" />
+                    <span className="text-gray-300">{selectedVideoData.duration}</span>
+                  </div>
+                </div>
+                <span className={`text-xs px-3 py-1 rounded-full ${
+                  selectedVideoData.category === 'strength' ? 'bg-red-600/20 text-red-400' :
+                  selectedVideoData.category === 'endurance' ? 'bg-blue-600/20 text-blue-400' :
+                  selectedVideoData.category === 'speed' ? 'bg-yellow-600/20 text-yellow-400' :
+                  selectedVideoData.category === 'flexibility' ? 'bg-green-600/20 text-green-400' :
+                  'bg-purple-600/20 text-purple-400'
+                }`}>
+                  {selectedVideoData.category}
+                </span>
+              </div>
+              <p className="text-gray-400 mt-3">{selectedVideoData.description}</p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

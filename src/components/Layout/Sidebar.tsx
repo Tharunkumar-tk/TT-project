@@ -7,10 +7,10 @@ import {
   Target, 
   Trophy, 
   User, 
-  ShoppingCart,
+  Award,
   Users,
   BarChart3,
-  Award
+  BookOpen
 } from 'lucide-react';
 
 const Sidebar: React.FC = () => {
@@ -23,7 +23,7 @@ const Sidebar: React.FC = () => {
     { to: '/athlete/dashboard', icon: Home, label: 'Dashboard' },
     { to: '/athlete/upload', icon: Upload, label: 'Upload Video' },
     { to: '/athlete/challenges', icon: Target, label: 'Challenges' },
-    { to: '/athlete/training', icon: Trophy, label: 'Training' },
+    { to: '/athlete/training', icon: BookOpen, label: 'Training' },
     { to: '/athlete/profile', icon: User, label: 'Profile' },
     { to: '/athlete/roadmap', icon: Award, label: 'Roadmap' },
   ];

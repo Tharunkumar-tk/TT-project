@@ -5,7 +5,6 @@ import Button from '../../components/UI/Button';
 import ProgressBar from '../../components/UI/ProgressBar';
 import { 
   Users, 
-  Upload, 
   BarChart3, 
   Award, 
   MessageSquare, 
@@ -13,7 +12,7 @@ import {
   TrendingUp,
   Calendar,
   Star,
-  Video
+  Target
 } from 'lucide-react';
 
 interface Athlete {
@@ -38,12 +37,12 @@ interface TrainingPlan {
 
 const CoachDashboard: React.FC = () => {
   const { user } = useAuth();
-  const [selectedTab, setSelectedTab] = useState<'overview' | 'athletes' | 'plans' | 'videos'>('overview');
+  const [selectedTab, setSelectedTab] = useState<'overview' | 'athletes' | 'plans' | 'analytics'>('overview');
 
   const mockAthletes: Athlete[] = [
     {
       id: '1',
-      name: 'Alex Johnson',
+      name: 'Arjun Sharma',
       avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150',
       xp: 1250,
       level: 5,
@@ -53,7 +52,7 @@ const CoachDashboard: React.FC = () => {
     },
     {
       id: '2',
-      name: 'Sarah Williams',
+      name: 'Priya Patel',
       avatar: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=150',
       xp: 980,
       level: 4,
@@ -63,13 +62,23 @@ const CoachDashboard: React.FC = () => {
     },
     {
       id: '3',
-      name: 'Mike Chen',
+      name: 'Sanjay Kumar',
       avatar: 'https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=150',
       xp: 1450,
       level: 6,
       streak: 15,
       lastActive: '30 minutes ago',
       progress: 85
+    },
+    {
+      id: '4',
+      name: 'Meena Singh',
+      avatar: 'https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=150',
+      xp: 750,
+      level: 3,
+      streak: 5,
+      lastActive: '3 hours ago',
+      progress: 45
     }
   ];
 
@@ -103,7 +112,7 @@ const CoachDashboard: React.FC = () => {
         </div>
         <div className="flex gap-3">
           <Button icon={Plus} variant="primary">Create Plan</Button>
-          <Button icon={Upload} variant="secondary">Upload Video</Button>
+          <Button icon={Target} variant="secondary">Create Challenge</Button>
         </div>
       </div>
 
@@ -172,7 +181,7 @@ const CoachDashboard: React.FC = () => {
             { id: 'overview', name: 'Overview', icon: BarChart3 },
             { id: 'athletes', name: 'Athletes', icon: Users },
             { id: 'plans', name: 'Training Plans', icon: Calendar },
-            { id: 'videos', name: 'Videos', icon: Video }
+            { id: 'analytics', name: 'Analytics', icon: BarChart3 }
           ].map(tab => {
             const Icon = tab.icon;
             return (
@@ -200,9 +209,9 @@ const CoachDashboard: React.FC = () => {
             <h3 className="text-xl font-bold text-white mb-4">Recent Activity</h3>
             <div className="space-y-3">
               {[
-                { athlete: 'Alex Johnson', action: 'Completed Jump Test', time: '2 hours ago', result: '52cm' },
-                { athlete: 'Sarah Williams', action: 'Uploaded Push-up Video', time: '4 hours ago', result: '25 reps' },
-                { athlete: 'Mike Chen', action: 'Finished Shuttle Run', time: '1 day ago', result: '11.8s' },
+                { athlete: 'Arjun Sharma', action: 'Completed Jump Test', time: '2 hours ago', result: '52cm' },
+                { athlete: 'Priya Patel', action: 'Uploaded Push-up Video', time: '4 hours ago', result: '25 reps' },
+                { athlete: 'Sanjay Kumar', action: 'Finished Shuttle Run', time: '1 day ago', result: '11.8s' },
               ].map((activity, index) => (
                 <div key={index} className="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
                   <div>
@@ -314,19 +323,32 @@ const CoachDashboard: React.FC = () => {
         </Card>
       )}
 
-      {selectedTab === 'videos' && (
+      {selectedTab === 'analytics' && (
         <Card>
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-bold text-white">Training Videos</h3>
-            <Button variant="primary" icon={Upload}>Upload Video</Button>
-          </div>
-          <div className="text-center py-12">
-            <Video className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h4 className="text-xl font-bold text-white mb-2">Upload Training Content</h4>
-            <p className="text-gray-400 mb-4">Share instructional videos that will appear in the Training Center for all athletes</p>
-            <Button variant="primary" icon={Upload}>
-              Upload Your First Video
-            </Button>
+          <h3 className="text-xl font-bold text-white mb-6">Quick Analytics</h3>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="bg-green-600/20 rounded-lg p-4">
+              <h4 className="text-green-400 font-medium mb-2">Most Active Athletes</h4>
+              <div className="space-y-2">
+                {mockAthletes.slice(0, 3).map((athlete, index) => (
+                  <div key={athlete.id} className="flex justify-between items-center">
+                    <span className="text-white text-sm">{athlete.name}</span>
+                    <span className="text-green-400 text-sm">{athlete.streak} days</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="bg-purple-600/20 rounded-lg p-4">
+              <h4 className="text-purple-400 font-medium mb-2">Top Performers</h4>
+              <div className="space-y-2">
+                {mockAthletes.sort((a, b) => b.xp - a.xp).slice(0, 3).map((athlete, index) => (
+                  <div key={athlete.id} className="flex justify-between items-center">
+                    <span className="text-white text-sm">{athlete.name}</span>
+                    <span className="text-purple-400 text-sm">{athlete.xp} XP</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </Card>
       )}

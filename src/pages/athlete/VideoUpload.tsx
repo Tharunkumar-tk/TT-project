@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useGame } from '../../contexts/GameContext';
 import Card from '../../components/UI/Card';
 import Button from '../../components/UI/Button';
-import { Upload, Video, Zap, Trophy, AlertCircle, CheckCircle } from 'lucide-react';
+import { Upload, Video, Zap, Trophy, CheckCircle } from 'lucide-react';
 
 type TestType = 'jump' | 'shuttle' | 'pushup' | 'situp' | 'endurance';
 
@@ -20,7 +20,7 @@ interface AnalysisResult {
 
 const VideoUpload: React.FC = () => {
   const { user, updateUser } = useAuth();
-  const { earnXP, earnCoins } = useGame();
+  const { earnXP, earnCoins, updateProgress, updateBadgeProgress } = useGame();
   const [searchParams] = useSearchParams();
   const [selectedTest, setSelectedTest] = useState<TestType>(
     (searchParams.get('activity') as TestType) || 'jump'
@@ -29,6 +29,15 @@ const VideoUpload: React.FC = () => {
   const [analyzing, setAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
 
+  const challengeId = searchParams.get('challenge');
+
+  useEffect(() => {
+    const activity = searchParams.get('activity') as TestType;
+    if (activity) {
+      setSelectedTest(activity);
+    }
+  }, [searchParams]);
+
   const testTypes = [
     { 
       id: 'jump' as TestType, 
@@ -36,7 +45,7 @@ const VideoUpload: React.FC = () => {
       icon: '🦘', 
       description: 'Measure your jump height',
       demoVideo: 'https://images.pexels.com/photos/1552242/pexels-photo-1552242.jpeg?auto=compress&cs=tinysrgb&w=600',
-      instructions: 'Stand with feet shoulder-width apart, jump as high as possible with arms extended upward'
+      instructions: 'Stand with feet shoulder-width apart, jump as high as possible with arms extended upward. Make sure the camera captures your full body and the ground reference.'
     },
     { 
       id: 'shuttle' as TestType, 
@@ -44,7 +53,7 @@ const VideoUpload: React.FC = () => {
       icon: '🏃', 
       description: 'Test your agility and speed',
       demoVideo: 'https://images.pexels.com/photos/2294361/pexels-photo-2294361.jpeg?auto=compress&cs=tinysrgb&w=600',
-      instructions: 'Run between two points 10 meters apart, touch each line, complete 4 rounds'
+      instructions: 'Set up two markers 10 meters apart. Run between them, touching each line. Complete 4 rounds as fast as possible. Camera should capture the full running path.'
     },
     { 
       id: 'pushup' as TestType, 
@@ -52,7 +61,7 @@ const VideoUpload: React.FC = () => {
       icon: '💪', 
       description: 'Count your push-up reps',
       demoVideo: 'https://images.pexels.com/photos/416809/pexels-photo-416809.jpeg?auto=compress&cs=tinysrgb&w=600',
-      instructions: 'Keep body straight, lower chest to ground, push back up. Count each complete rep'
+      instructions: 'Keep body straight, lower chest to ground, push back up. Count each complete rep. Camera should show your side profile for proper form verification.'
     },
     { 
       id: 'situp' as TestType, 
@@ -60,7 +69,7 @@ const VideoUpload: React.FC = () => {
       icon: '🤸', 
       description: 'Count your sit-up reps',
       demoVideo: 'https://images.pexels.com/photos/4056723/pexels-photo-4056723.jpeg?auto=compress&cs=tinysrgb&w=600',
-      instructions: 'Lie on back, knees bent, hands behind head. Lift torso to knees, lower back down'
+      instructions: 'Lie on back, knees bent, hands behind head. Lift torso to knees, lower back down. Camera should capture your full body movement.'
     },
     { 
       id: 'endurance' as TestType, 
@@ -68,9 +77,11 @@ const VideoUpload: React.FC = () => {
       icon: '🏃‍♀️', 
       description: 'Track your running performance',
       demoVideo: 'https://images.pexels.com/photos/2803158/pexels-photo-2803158.jpeg?auto=compress&cs=tinysrgb&w=600',
-      instructions: 'Run at steady pace for specified distance. Maintain consistent breathing rhythm'
+      instructions: 'Run at steady pace for specified distance. Maintain consistent breathing rhythm. Use a fitness tracker or phone app to record distance and time.'
     },
   ];
+
+  const selectedTestData = testTypes.find(t => t.id === selectedTest);
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -150,6 +161,18 @@ const VideoUpload: React.FC = () => {
       });
     }
 
+    // Update challenge progress if linked
+    if (challengeId) {
+      updateProgress(challengeId, result.testType === 'pushup' ? 28 : 1);
+    }
+
+    // Update badge progress
+    updateBadgeProgress('video-verified', 1);
+    if (result.testType === 'pushup') {
+      updateBadgeProgress('pushup-pro', 28);
+      updateBadgeProgress('iron-arms', 28);
+    }
+
     earnXP(result.xpEarned);
     earnCoins(result.coinsEarned);
     setAnalyzing(false);
@@ -160,7 +183,7 @@ const VideoUpload: React.FC = () => {
       <div>
         <h1 className="text-3xl font-bold text-white mb-2">Upload Performance Video</h1>
         <p className="text-gray-400">Upload a video of your athletic performance for AI-powered analysis and feedback.</p>
-        {searchParams.get('challenge') && (
+        {challengeId && (
           <div className="mt-3 p-3 bg-purple-600/20 rounded-lg border border-purple-500">
             <p className="text-purple-300 text-sm">
               📋 Challenge Mode: Upload a video to complete your active challenge
@@ -193,24 +216,6 @@ const VideoUpload: React.FC = () => {
                 </div>
               </div>
             ))}
-          </div>
-
-          {/* Demo Video Section */}
-          <div className="mt-6 pt-6 border-t border-gray-700">
-            <h3 className="text-lg font-bold text-white mb-3">Demo Video & Instructions</h3>
-            <div className="bg-gray-700 rounded-lg p-4">
-              <img 
-                src={testTypes.find(t => t.id === selectedTest)?.demoVideo}
-                alt={`${selectedTest} demo`}
-                className="w-full h-32 object-cover rounded-lg mb-3"
-              />
-              <div className="text-white font-medium mb-2">
-                How to perform {testTypes.find(t => t.id === selectedTest)?.name}
-              </div>
-              <p className="text-gray-300 text-sm">
-                {testTypes.find(t => t.id === selectedTest)?.instructions}
-              </p>
-            </div>
           </div>
         </Card>
 
@@ -280,6 +285,28 @@ const VideoUpload: React.FC = () => {
               </div>
               <div className="text-sm text-blue-300 mt-2">
                 This may take a few moments. Our AI is detecting movement patterns and measuring performance metrics.
+              </div>
+            </div>
+          )}
+
+          {/* Demo Video & Instructions */}
+          {selectedTestData && (
+            <div className="mt-6 pt-6 border-t border-gray-700">
+              <h3 className="text-lg font-bold text-white mb-3">Demo & Instructions</h3>
+              <div className="bg-gray-700 rounded-lg overflow-hidden">
+                <img 
+                  src={selectedTestData.demoVideo}
+                  alt={`${selectedTest} demo`}
+                  className="w-full h-48 object-cover"
+                />
+                <div className="p-4">
+                  <div className="text-white font-medium mb-2">
+                    How to perform {selectedTestData.name}
+                  </div>
+                  <p className="text-gray-300 text-sm">
+                    {selectedTestData.instructions}
+                  </p>
+                </div>
               </div>
             </div>
           )}

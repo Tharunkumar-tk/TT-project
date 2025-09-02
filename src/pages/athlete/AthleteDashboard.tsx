@@ -13,20 +13,18 @@ import {
   TrendingUp, 
   Calendar,
   Star,
-  Users,
   Clock,
   Award
 } from 'lucide-react';
 
 const AthleteDashboard: React.FC = () => {
   const { user } = useAuth();
-  const { challenges, badges, leaderboard } = useGame();
+  const { challenges, badges } = useGame();
 
   if (!user) return null;
 
   const activeChallenges = challenges.filter(c => !c.completed);
   const recentBadges = badges.filter(b => b.unlocked).slice(0, 3);
-  const userRank = Math.floor(Math.random() * 50) + 1;
 
   return (
     <div className="space-y-6">
@@ -106,14 +104,14 @@ const AthleteDashboard: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center space-x-2 mb-1">
-                <Trophy className="w-5 h-5 text-purple-400" />
-                <span className="text-gray-400 text-sm">Rank</span>
+                <Award className="w-5 h-5 text-purple-400" />
+                <span className="text-gray-400 text-sm">Badges</span>
               </div>
-              <div className="text-2xl font-bold text-white">#{userRank}</div>
-              <div className="text-sm text-purple-400">National</div>
+              <div className="text-2xl font-bold text-white">{badges.filter(b => b.unlocked).length}</div>
+              <div className="text-sm text-purple-400">Unlocked</div>
             </div>
             <div className="bg-purple-600/20 p-3 rounded-lg">
-              <Trophy className="w-6 h-6 text-purple-400" />
+              <Award className="w-6 h-6 text-purple-400" />
             </div>
           </div>
         </Card>
@@ -198,33 +196,30 @@ const AthleteDashboard: React.FC = () => {
             )}
           </Card>
 
-          {/* Quick Leaderboard */}
+          {/* Progress Overview */}
           <Card>
             <h3 className="text-lg font-bold text-white mb-4 flex items-center">
               <Trophy className="w-5 h-5 text-purple-500 mr-2" />
-              Top Performers
+              Progress Overview
             </h3>
             <div className="space-y-3">
-              {leaderboard.slice(0, 3).map((entry, index) => (
-                <div key={entry.id} className="flex items-center space-x-3">
-                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                    index === 0 ? 'bg-yellow-500' : index === 1 ? 'bg-gray-400' : 'bg-orange-600'
-                  }`}>
-                    {entry.rank}
-                  </div>
-                  <img src={entry.avatar} alt={entry.name} className="w-8 h-8 rounded-full" />
-                  <div className="flex-1">
-                    <div className="text-white font-medium text-sm">{entry.name}</div>
-                    <div className="text-xs text-gray-400">{entry.xp} XP</div>
-                  </div>
-                </div>
-              ))}
+              <div className="flex justify-between items-center">
+                <span className="text-gray-400">Badges Unlocked</span>
+                <span className="text-purple-400 font-medium">
+                  {badges.filter(b => b.unlocked).length}/30
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-400">Challenges Completed</span>
+                <span className="text-green-400 font-medium">
+                  {challenges.filter(c => c.completed).length}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-400">Current Streak</span>
+                <span className="text-orange-400 font-medium">{user.streak} days</span>
+              </div>
             </div>
-            <Link to="/athlete/leaderboard" className="block mt-3">
-              <Button variant="secondary" size="sm" className="w-full">
-                View Full Leaderboard
-              </Button>
-            </Link>
           </Card>
 
           {/* Quick Actions */}
