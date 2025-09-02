@@ -4,7 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useGame } from '../../contexts/GameContext';
 import Card from '../../components/UI/Card';
 import Button from '../../components/UI/Button';
-import { Upload, Video, Zap, Trophy, CheckCircle } from 'lucide-react';
+import { Upload, Video, Zap, Trophy, CheckCircle, AlertTriangle, Eye, Camera } from 'lucide-react';
 
 type TestType = 'jump' | 'shuttle' | 'pushup' | 'situp' | 'endurance';
 
@@ -18,6 +18,12 @@ interface AnalysisResult {
   cheatDetection: boolean;
 }
 
+interface VideoValidation {
+  isValid: boolean;
+  warnings: string[];
+  errors: string[];
+}
+
 const VideoUpload: React.FC = () => {
   const { user, updateUser } = useAuth();
   const { earnXP, earnCoins, updateProgress, updateBadgeProgress } = useGame();
@@ -28,6 +34,8 @@ const VideoUpload: React.FC = () => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
+  const [videoValidation, setVideoValidation] = useState<VideoValidation | null>(null);
+  const [showDemo, setShowDemo] = useState(false);
 
   const challengeId = searchParams.get('challenge');
 
@@ -44,40 +52,50 @@ const VideoUpload: React.FC = () => {
       name: 'Vertical Jump', 
       icon: '🦘', 
       description: 'Measure your jump height',
-      demoVideo: 'https://images.pexels.com/photos/1552242/pexels-photo-1552242.jpeg?auto=compress&cs=tinysrgb&w=600',
-      instructions: 'Stand with feet shoulder-width apart, jump as high as possible with arms extended upward. Make sure the camera captures your full body and the ground reference.'
+      demoGif: '/challenge-demos/ssvid.net--Vertical-Jump_v720P (online-video-cutter.com).gif',
+      instructions: 'Stand with feet shoulder-width apart, jump as high as possible with arms extended upward. Make sure the camera captures your full body and the ground reference.',
+      postureGuide: 'Camera should be positioned 3-4 meters away at waist height. Ensure full body is visible from head to toe. Jump straight up with arms reaching overhead.',
+      angleGuide: 'Side view (90° angle) works best for measuring jump height. Avoid front or back angles.'
     },
     { 
       id: 'shuttle' as TestType, 
       name: 'Shuttle Run', 
       icon: '🏃', 
       description: 'Test your agility and speed',
-      demoVideo: 'https://images.pexels.com/photos/2294361/pexels-photo-2294361.jpeg?auto=compress&cs=tinysrgb&w=600',
-      instructions: 'Set up two markers 10 meters apart. Run between them, touching each line. Complete 4 rounds as fast as possible. Camera should capture the full running path.'
+      demoGif: '/challenge-demos/ssvid.net--Shuttle-Run_1080p (online-video-cutter.com) (1).gif',
+      instructions: 'Set up two markers 10 meters apart. Run between them, touching each line. Complete 4 rounds as fast as possible. Camera should capture the full running path.',
+      postureGuide: 'Maintain low center of gravity when changing direction. Touch the line with your hand at each turn.',
+      angleGuide: 'Position camera to capture the full 10-meter distance. Side angle preferred to see full running motion.'
     },
     { 
       id: 'pushup' as TestType, 
       name: 'Push-ups', 
       icon: '💪', 
       description: 'Count your push-up reps',
-      demoVideo: 'https://images.pexels.com/photos/416809/pexels-photo-416809.jpeg?auto=compress&cs=tinysrgb&w=600',
-      instructions: 'Keep body straight, lower chest to ground, push back up. Count each complete rep. Camera should show your side profile for proper form verification.'
+      demoGif: '/challenge-demos/ssvid.net--How-to-do-a-Push-Up-Proper-Form-Technique_1080p (online-video-cutter.com) (1).gif',
+      instructions: 'Keep body straight, lower chest to ground, push back up. Count each complete rep. Camera should show your side profile for proper form verification.',
+      postureGuide: 'Maintain straight line from head to heels. Lower chest until it nearly touches ground. Push up to full arm extension.',
+      angleGuide: 'Side view is essential for form verification. Camera should be at ground level to see proper depth.'
     },
     { 
       id: 'situp' as TestType, 
       name: 'Sit-ups', 
       icon: '🤸', 
       description: 'Count your sit-up reps',
-      demoVideo: 'https://images.pexels.com/photos/4056723/pexels-photo-4056723.jpeg?auto=compress&cs=tinysrgb&w=600',
-      instructions: 'Lie on back, knees bent, hands behind head. Lift torso to knees, lower back down. Camera should capture your full body movement.'
+      demoGif: '/challenge-demos/4921658-hd_1066_1920_25fps (online-video-cutter.com).gif',
+      instructions: 'Lie on back, knees bent, hands behind head. Lift torso to knees, lower back down. Camera should capture your full body movement.',
+      postureGuide: 'Keep knees bent at 90°, hands behind head (not pulling neck). Lift shoulder blades off ground completely.',
+      angleGuide: 'Side view captures the full range of motion best. Ensure camera shows complete up and down movement.'
     },
     { 
       id: 'endurance' as TestType, 
       name: 'Endurance Run', 
       icon: '🏃‍♀️', 
       description: 'Track your running performance',
-      demoVideo: 'https://images.pexels.com/photos/2803158/pexels-photo-2803158.jpeg?auto=compress&cs=tinysrgb&w=600',
-      instructions: 'Run at steady pace for specified distance. Maintain consistent breathing rhythm. Use a fitness tracker or phone app to record distance and time.'
+      demoGif: '/challenge-demos/Become obsessed (online-video-cutter.com) (1).gif',
+      instructions: 'Run at steady pace for specified distance. Maintain consistent breathing rhythm. Use a fitness tracker or phone app to record distance and time.',
+      postureGuide: 'Maintain upright posture, relaxed shoulders, and consistent stride. Land on midfoot, not heel.',
+      angleGuide: 'Side view or slight diagonal angle works best. Capture full stride and running form.'
     },
   ];
 
@@ -88,7 +106,43 @@ const VideoUpload: React.FC = () => {
     if (file) {
       setUploadedFile(file);
       setAnalysisResult(null);
+      
+      // Perform basic video validation
+      validateVideo(file);
     }
+  };
+
+  const validateVideo = (file: File) => {
+    const warnings: string[] = [];
+    const errors: string[] = [];
+    
+    // File size validation
+    const maxSize = 100 * 1024 * 1024; // 100MB
+    if (file.size > maxSize) {
+      errors.push('Video file is too large. Please keep it under 100MB.');
+    }
+    
+    // File type validation
+    const allowedTypes = ['video/mp4', 'video/mov', 'video/avi', 'video/quicktime'];
+    if (!allowedTypes.includes(file.type)) {
+      errors.push('Unsupported video format. Please use MP4, MOV, or AVI.');
+    }
+    
+    // Duration estimation (rough)
+    if (file.size < 5 * 1024 * 1024) { // Less than 5MB
+      warnings.push('Video appears to be very short. Ensure you capture the complete exercise.');
+    }
+    
+    // Quality estimation based on file size and type
+    if (file.size < 2 * 1024 * 1024) { // Less than 2MB
+      warnings.push('Video quality may be too low. Ensure good lighting and stable camera.');
+    }
+    
+    setVideoValidation({
+      isValid: errors.length === 0,
+      warnings,
+      errors
+    });
   };
 
   const getMockAnalysis = (testType: TestType): AnalysisResult => {
@@ -144,6 +198,10 @@ const VideoUpload: React.FC = () => {
 
   const handleAnalyze = async () => {
     if (!uploadedFile) return;
+    
+    if (videoValidation && !videoValidation.isValid) {
+      return; // Don't analyze if validation failed
+    }
 
     setAnalyzing(true);
     
@@ -192,7 +250,7 @@ const VideoUpload: React.FC = () => {
         )}
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-6">
+      <div className="grid lg:grid-cols-3 gap-6">
         {/* Test Selection */}
         <Card>
           <h2 className="text-xl font-bold text-white mb-4">Select Test Type</h2>
@@ -217,6 +275,19 @@ const VideoUpload: React.FC = () => {
               </div>
             ))}
           </div>
+          
+          {selectedTestData && (
+            <div className="mt-4 pt-4 border-t border-gray-700">
+              <Button 
+                variant="secondary" 
+                className="w-full" 
+                icon={Eye}
+                onClick={() => setShowDemo(true)}
+              >
+                View Demo & Instructions
+              </Button>
+            </div>
+          )}
         </Card>
 
         {/* Video Upload */}
@@ -257,10 +328,48 @@ const VideoUpload: React.FC = () => {
                 </div>
               </div>
 
+              {/* Video Validation Results */}
+              {videoValidation && (
+                <div className="space-y-2">
+                  {videoValidation.errors.length > 0 && (
+                    <div className="bg-red-600/20 border border-red-500 rounded-lg p-3">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <AlertTriangle className="w-4 h-4 text-red-400" />
+                        <span className="text-red-400 font-medium">Upload Errors</span>
+                      </div>
+                      {videoValidation.errors.map((error, index) => (
+                        <p key={index} className="text-red-300 text-sm">• {error}</p>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {videoValidation.warnings.length > 0 && (
+                    <div className="bg-yellow-600/20 border border-yellow-500 rounded-lg p-3">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <AlertTriangle className="w-4 h-4 text-yellow-400" />
+                        <span className="text-yellow-400 font-medium">Quality Warnings</span>
+                      </div>
+                      {videoValidation.warnings.map((warning, index) => (
+                        <p key={index} className="text-yellow-300 text-sm">• {warning}</p>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {videoValidation.isValid && videoValidation.warnings.length === 0 && (
+                    <div className="bg-green-600/20 border border-green-500 rounded-lg p-3">
+                      <div className="flex items-center space-x-2">
+                        <CheckCircle className="w-4 h-4 text-green-400" />
+                        <span className="text-green-400 font-medium">Video looks good!</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
               <div className="flex gap-3">
                 <Button 
                   onClick={handleAnalyze}
-                  disabled={analyzing}
+                  disabled={analyzing || (videoValidation && !videoValidation.isValid)}
                   className="flex-1"
                   icon={analyzing ? undefined : Zap}
                 >
@@ -288,14 +397,184 @@ const VideoUpload: React.FC = () => {
               </div>
             </div>
           )}
+        </Card>
 
-          {/* Demo Video & Instructions */}
+        {/* Demo & Instructions Panel */}
+        {selectedTestData && (
+          <Card>
+            <h2 className="text-xl font-bold text-white mb-4 flex items-center">
+              <Camera className="w-6 h-6 text-blue-500 mr-2" />
+              Demo & Instructions
+            </h2>
+            
+            {/* Demo GIF */}
+            <div className="bg-gray-700 rounded-lg overflow-hidden mb-4">
+              <img 
+                src={selectedTestData.demoGif}
+                alt={`${selectedTest} demo`}
+                className="w-full h-48 object-cover"
+              />
+              <div className="p-3 bg-gray-800">
+                <div className="text-white font-medium text-sm mb-1">
+                  Perfect {selectedTestData.name} Form
+                </div>
+                <div className="text-gray-400 text-xs">
+                  Follow this exact posture and movement
+                </div>
+              </div>
+            </div>
+
+            {/* Instructions */}
+            <div className="space-y-4">
+              <div className="bg-blue-600/20 rounded-lg p-3">
+                <h4 className="text-blue-400 font-medium mb-2">📋 Exercise Instructions</h4>
+                <p className="text-gray-300 text-sm">{selectedTestData.instructions}</p>
+              </div>
+
+              <div className="bg-green-600/20 rounded-lg p-3">
+                <h4 className="text-green-400 font-medium mb-2">🎯 Posture Guide</h4>
+                <p className="text-gray-300 text-sm">{selectedTestData.postureGuide}</p>
+              </div>
+
+              <div className="bg-purple-600/20 rounded-lg p-3">
+                <h4 className="text-purple-400 font-medium mb-2">📹 Camera Angle</h4>
+                <p className="text-gray-300 text-sm">{selectedTestData.angleGuide}</p>
+              </div>
+
+              <div className="bg-yellow-600/20 rounded-lg p-3">
+                <h4 className="text-yellow-400 font-medium mb-2">💡 Quality Tips</h4>
+                <ul className="text-gray-300 text-sm space-y-1">
+                  <li>• Ensure good lighting (natural light preferred)</li>
+                  <li>• Keep camera stable (use tripod or stable surface)</li>
+                  <li>• Wear contrasting colors against background</li>
+                  <li>• Record in landscape mode for better analysis</li>
+                </ul>
+              </div>
+            </div>
+          </Card>
+        )}
+      </div>
+
+      {/* Demo Modal */}
+      {showDemo && selectedTestData && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800 rounded-xl border border-gray-700 w-full max-w-4xl max-h-[90vh] overflow-hidden">
+            <div className="flex justify-between items-center p-4 border-b border-gray-700">
+              <h3 className="text-xl font-bold text-white">{selectedTestData.name} Demo</h3>
+              <button
+                onClick={() => setShowDemo(false)}
+                className="text-gray-400 hover:text-white"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            <div className="p-6">
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <img 
+                    src={selectedTestData.demoGif}
+                    alt={`${selectedTest} demo`}
+                    className="w-full rounded-lg"
+                  />
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="text-white font-medium mb-2">Exercise Instructions</h4>
+                    <p className="text-gray-300 text-sm">{selectedTestData.instructions}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-white font-medium mb-2">Posture Guide</h4>
+                    <p className="text-gray-300 text-sm">{selectedTestData.postureGuide}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-white font-medium mb-2">Camera Positioning</h4>
+                    <p className="text-gray-300 text-sm">{selectedTestData.angleGuide}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Video Quality Guidelines */}
+      <Card>
+        <h2 className="text-xl font-bold text-white mb-4 flex items-center">
+          <CheckCircle className="w-6 h-6 text-green-500 mr-2" />
+          Video Quality Guidelines
+        </h2>
+        <div className="grid md:grid-cols-3 gap-4">
+          <div className="bg-green-600/20 rounded-lg p-4">
+            <h4 className="text-green-400 font-medium mb-2">✅ Good Quality</h4>
+            <ul className="text-gray-300 text-sm space-y-1">
+              <li>• Clear, well-lit video</li>
+              <li>• Stable camera position</li>
+              <li>• Full body visible</li>
+              <li>• Proper camera angle</li>
+            </ul>
+          </div>
+          <div className="bg-yellow-600/20 rounded-lg p-4">
+            <h4 className="text-yellow-400 font-medium mb-2">⚠️ Needs Improvement</h4>
+            <ul className="text-gray-300 text-sm space-y-1">
+              <li>• Slightly dark lighting</li>
+              <li>• Minor camera shake</li>
+              <li>• Partial body visibility</li>
+              <li>• Suboptimal angle</li>
+            </ul>
+          </div>
+          <div className="bg-red-600/20 rounded-lg p-4">
+            <h4 className="text-red-400 font-medium mb-2">❌ Poor Quality</h4>
+            <ul className="text-gray-300 text-sm space-y-1">
+              <li>• Too dark to analyze</li>
+              <li>• Excessive camera movement</li>
+              <li>• Body not fully visible</li>
+              <li>• Wrong camera angle</li>
+            </ul>
+          </div>
+        </div>
+      </Card>
+
+      {/* Current Challenge Info */}
+      {challengeId && selectedTestData && (
+        <Card>
+          <h2 className="text-xl font-bold text-white mb-4 flex items-center">
+            <Target className="w-6 h-6 text-purple-500 mr-2" />
+            Challenge Requirements
+          </h2>
+          <div className="bg-purple-600/20 rounded-lg p-4">
+            <div className="flex items-center space-x-3 mb-3">
+              <span className="text-2xl">{selectedTestData.icon}</span>
+              <div>
+                <h3 className="text-white font-medium">{selectedTestData.name} Challenge</h3>
+                <p className="text-gray-400 text-sm">Follow the demo exactly for best results</p>
+              </div>
+            </div>
+            <div className="grid md:grid-cols-2 gap-4 text-sm">
+              <div>
+                <span className="text-purple-400 font-medium">Required Posture:</span>
+                <p className="text-gray-300">{selectedTestData.postureGuide}</p>
+              </div>
+              <div>
+                <span className="text-purple-400 font-medium">Camera Setup:</span>
+                <p className="text-gray-300">{selectedTestData.angleGuide}</p>
+              </div>
+            </div>
+          </div>
+        </Card>
+      )}
+
+      {/* Demo & Instructions - Moved to separate section */}
+      {selectedTestData && !showDemo && (
+        <div className="lg:hidden">
           {selectedTestData && (
-            <div className="mt-6 pt-6 border-t border-gray-700">
-              <h3 className="text-lg font-bold text-white mb-3">Demo & Instructions</h3>
+            <Card>
+              <h3 className="text-lg font-bold text-white mb-3 flex items-center">
+                <Camera className="w-5 h-5 text-blue-500 mr-2" />
+                Demo & Instructions
+              </h3>
               <div className="bg-gray-700 rounded-lg overflow-hidden">
                 <img 
-                  src={selectedTestData.demoVideo}
+                  src={selectedTestData.demoGif}
                   alt={`${selectedTest} demo`}
                   className="w-full h-48 object-cover"
                 />
@@ -308,10 +587,10 @@ const VideoUpload: React.FC = () => {
                   </p>
                 </div>
               </div>
-            </div>
+            </Card>
           )}
-        </Card>
-      </div>
+        </div>
+      )}
 
       {/* Analysis Results */}
       {analysisResult && (

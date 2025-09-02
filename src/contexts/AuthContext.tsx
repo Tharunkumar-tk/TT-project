@@ -1,6 +1,11 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { saveUser, loadUser, UserProfile, saveTutorialComplete, loadTutorialComplete } from '../utils/storage';
 
+interface AuthError {
+  type: 'account_not_found' | 'incorrect_password' | 'general';
+  message: string;
+}
+
 interface AuthContextType {
   user: UserProfile | null;
   login: (email: string, password: string, role: 'athlete' | 'coach') => Promise<void>;
@@ -11,6 +16,8 @@ interface AuthContextType {
   setShowTutorial: (show: boolean) => void;
   showOnboarding: boolean;
   setShowOnboarding: (show: boolean) => void;
+  authError: AuthError | null;
+  clearAuthError: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -31,6 +38,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [showTutorial, setShowTutorial] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [authError, setAuthError] = useState<AuthError | null>(null);
 
   // Load user from storage on app start
   useEffect(() => {
@@ -41,44 +49,64 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   const login = async (email: string, password: string, role: 'athlete' | 'coach') => {
-    // Check if user exists in storage
-    const existingUser = loadUser();
+    setAuthError(null);
     
-    if (existingUser && existingUser.email === email) {
-      setUser(existingUser);
-      return;
+    // Load all registered users from storage
+    const registeredUsers = JSON.parse(localStorage.getItem('talent_track_all_users') || '[]');
+    
+    // Find user by email
+    const existingUser = registeredUsers.find((u: UserProfile) => u.email === email);
+    
+    if (!existingUser) {
+      setAuthError({
+        type: 'account_not_found',
+        message: 'Account does not exist. Please check your email or sign up for a new account.'
+      });
+      throw new Error('Account not found');
     }
 
-    // Create new user
-    const newUser: UserProfile = {
-      id: Date.now().toString(),
-      email,
-      name: email.split('@')[0],
-      role,
-      avatar: getRandomIndianAvatar(),
-      onboardingComplete: false,
-      profileComplete: false,
-      ...(role === 'athlete' && {
-        xp: 0,
-        level: 1,
-        coins: 50,
-        streak: 0
-      })
-    };
+    // Check password (in real app, this would be hashed)
+    const storedPassword = localStorage.getItem(`talent_track_password_${existingUser.id}`);
+    if (storedPassword !== password) {
+      setAuthError({
+        type: 'incorrect_password',
+        message: 'Incorrect password. Please try again.'
+      });
+      throw new Error('Incorrect password');
+    }
 
-    setUser(newUser);
-    saveUser(newUser);
+    // Check role matches
+    if (existingUser.role !== role) {
+      setAuthError({
+        type: 'general',
+        message: `This account is registered as a ${existingUser.role}. Please select the correct role.`
+      });
+      throw new Error('Role mismatch');
+    }
 
-    // Show tutorial for new users
-    const tutorialComplete = loadTutorialComplete();
-    if (!tutorialComplete) {
-      setShowTutorial(true);
-    } else if (!newUser.onboardingComplete) {
-      setShowOnboarding(true);
+    // Login successful
+    if (existingUser) {
+      setUser(existingUser);
+      saveUser(existingUser);
+      return;
     }
   };
 
   const signup = async (email: string, password: string, name: string, role: 'athlete' | 'coach') => {
+    setAuthError(null);
+    
+    // Check if email already exists
+    const registeredUsers = JSON.parse(localStorage.getItem('talent_track_all_users') || '[]');
+    const existingUser = registeredUsers.find((u: UserProfile) => u.email === email);
+    
+    if (existingUser) {
+      setAuthError({
+        type: 'general',
+        message: 'An account with this email already exists. Please sign in instead.'
+      });
+      throw new Error('Account already exists');
+    }
+
     const newUser: UserProfile = {
       id: Date.now().toString(),
       email,
@@ -95,8 +123,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       })
     };
 
+    // Save user to both current user and all users list
     setUser(newUser);
     saveUser(newUser);
+    
+    // Save to all users list
+    const updatedUsers = [...registeredUsers, newUser];
+    localStorage.setItem('talent_track_all_users', JSON.stringify(updatedUsers));
+    
+    // Save password (in real app, this would be hashed)
+    localStorage.setItem(`talent_track_password_${newUser.id}`, password);
+    
     setShowTutorial(true);
   };
 
@@ -104,6 +141,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setUser(null);
     setShowTutorial(false);
     setShowOnboarding(false);
+    setAuthError(null);
   };
 
   const updateUser = (updates: Partial<UserProfile>) => {
@@ -111,7 +149,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const updatedUser = { ...user, ...updates };
       setUser(updatedUser);
       saveUser(updatedUser);
+      
+      // Update in all users list too
+      const registeredUsers = JSON.parse(localStorage.getItem('talent_track_all_users') || '[]');
+      const updatedUsers = registeredUsers.map((u: UserProfile) => 
+        u.id === user.id ? updatedUser : u
+      );
+      localStorage.setItem('talent_track_all_users', JSON.stringify(updatedUsers));
     }
+  };
+
+  const clearAuthError = () => {
+    setAuthError(null);
   };
 
   const getRandomIndianAvatar = () => {
@@ -134,7 +183,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     showTutorial,
     setShowTutorial,
     showOnboarding,
-    setShowOnboarding
+    setShowOnboarding,
+    authError,
+    clearAuthError
   };
 
   return (

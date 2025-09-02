@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Trophy, User, Users } from 'lucide-react';
+import { Trophy, User, Users, AlertCircle, X } from 'lucide-react';
 import Button from '../components/UI/Button';
 
 const Auth: React.FC = () => {
@@ -12,7 +12,7 @@ const Auth: React.FC = () => {
   const [role, setRole] = useState<'athlete' | 'coach'>('athlete');
   const [loading, setLoading] = useState(false);
   
-  const { login, signup } = useAuth();
+  const { login, signup, authError, clearAuthError } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -23,9 +23,15 @@ const Auth: React.FC = () => {
     }
   }, [searchParams]);
 
+  React.useEffect(() => {
+    // Clear auth error when switching between login/signup
+    clearAuthError();
+  }, [isLogin, clearAuthError]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    clearAuthError();
 
     try {
       if (isLogin) {
@@ -41,6 +47,7 @@ const Auth: React.FC = () => {
         navigate('/coach/dashboard');
       }
     } catch (error) {
+      // Error is already set in context, just log it
       console.error('Auth error:', error);
     } finally {
       setLoading(false);
@@ -60,6 +67,24 @@ const Auth: React.FC = () => {
               {isLogin ? 'Sign in to your account' : 'Create your account and start your journey'}
             </p>
           </div>
+
+          {/* Error Message */}
+          {authError && (
+            <div className="mb-6 p-4 bg-red-600/20 border border-red-500 rounded-lg">
+              <div className="flex items-start space-x-3">
+                <AlertCircle className="w-5 h-5 text-red-400 mt-0.5 flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="text-red-300 text-sm">{authError.message}</p>
+                </div>
+                <button
+                  onClick={clearAuthError}
+                  className="text-red-400 hover:text-red-300"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Role Selection */}
           <div className="mb-6">
