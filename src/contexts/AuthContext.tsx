@@ -51,90 +51,110 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (email: string, password: string, role: 'athlete' | 'coach') => {
     setAuthError(null);
     
-    // Load all registered users from storage
-    const registeredUsers = JSON.parse(localStorage.getItem('talent_track_all_users') || '[]');
-    
-    // Find user by email
-    const existingUser = registeredUsers.find((u: UserProfile) => u.email.toLowerCase() === email.toLowerCase());
-    
-    if (!existingUser) {
-      setAuthError({
-        type: 'account_not_found',
-        message: 'Account does not exist. Please check your email or sign up for a new account.'
-      });
-      throw new Error('Account not found');
-    }
+    try {
+      // Load all registered users from storage
+      const registeredUsers = JSON.parse(localStorage.getItem('talent_track_all_users') || '[]');
+      
+      // Find user by email (case-insensitive)
+      const existingUser = registeredUsers.find((u: UserProfile) => 
+        u.email.toLowerCase() === email.toLowerCase()
+      );
+      
+      if (!existingUser) {
+        setAuthError({
+          type: 'account_not_found',
+          message: "Account doesn't exist."
+        });
+        throw new Error('Account not found');
+      }
 
-    // Check password (in real app, this would be hashed)
-    const storedPassword = localStorage.getItem(`talent_track_password_${existingUser.id}`);
-    if (storedPassword !== password) {
-      setAuthError({
-        type: 'incorrect_password',
-        message: 'Incorrect password. Please try again.'
-      });
-      throw new Error('Incorrect password');
-    }
+      // Check password (in real app, this would be hashed)
+      const storedPassword = localStorage.getItem(`talent_track_password_${existingUser.id}`);
+      if (storedPassword !== password) {
+        setAuthError({
+          type: 'incorrect_password',
+          message: "Incorrect password."
+        });
+        throw new Error('Incorrect password');
+      }
 
-    // Check role matches
-    if (existingUser.role !== role) {
-      setAuthError({
-        type: 'general',
-        message: `This account is registered as a ${existingUser.role}. Please select the correct role.`
-      });
-      throw new Error('Role mismatch');
-    }
+      // Check role matches
+      if (existingUser.role !== role) {
+        setAuthError({
+          type: 'general',
+          message: `This account is registered as a ${existingUser.role}. Please select the correct role.`
+        });
+        throw new Error('Role mismatch');
+      }
 
-    // Login successful
-    if (existingUser) {
+      // Login successful - ensure persistence
       setUser(existingUser);
       saveUser(existingUser);
-      return;
+      
+      // Clear any existing errors
+      setAuthError(null);
+    } catch (error) {
+      // Re-throw to be handled by the calling component
+      throw error;
     }
   };
 
   const signup = async (email: string, password: string, name: string, role: 'athlete' | 'coach') => {
     setAuthError(null);
     
-    // Check if email already exists
-    const registeredUsers = JSON.parse(localStorage.getItem('talent_track_all_users') || '[]');
-    const existingUser = registeredUsers.find((u: UserProfile) => u.email.toLowerCase() === email.toLowerCase());
-    
-    if (existingUser) {
-      setAuthError({
-        type: 'general',
-        message: 'An account with this email already exists. Please sign in instead.'
-      });
-      throw new Error('Account already exists');
+    try {
+      // Check if email already exists
+      const registeredUsers = JSON.parse(localStorage.getItem('talent_track_all_users') || '[]');
+      const existingUser = registeredUsers.find((u: UserProfile) => 
+        u.email.toLowerCase() === email.toLowerCase()
+      );
+      
+      if (existingUser) {
+        setAuthError({
+          type: 'general',
+          message: 'An account with this email already exists. Please sign in instead.'
+        });
+        throw new Error('Account already exists');
+      }
+
+      const newUser: UserProfile = {
+        id: Date.now().toString(),
+        email: email.toLowerCase(),
+        name,
+        role,
+        avatar: getRandomIndianAvatar(),
+        onboardingComplete: false,
+        profileComplete: false,
+        ...(role === 'athlete' && {
+          xp: 0,
+          level: 1,
+          coins: 50,
+          streak: 0
+        })
+      };
+
+      // Save user to both current user and all users list
+      setUser(newUser);
+      saveUser(newUser);
+      
+      // Save to all users list
+      const updatedUsers = [...registeredUsers, newUser];
+      localStorage.setItem('talent_track_all_users', JSON.stringify(updatedUsers));
+      
+      // Save password (in real app, this would be hashed)
+      localStorage.setItem(`talent_track_password_${newUser.id}`, password);
+      
+      // Show tutorial for athletes only
+      if (role === 'athlete') {
+        setShowTutorial(true);
+      }
+      
+      // Clear any existing errors
+      setAuthError(null);
+    } catch (error) {
+      // Re-throw to be handled by the calling component
+      throw error;
     }
-
-    const newUser: UserProfile = {
-      id: Date.now().toString(),
-      email: email.toLowerCase(),
-      name,
-      role,
-      avatar: getRandomIndianAvatar(),
-      onboardingComplete: false,
-      profileComplete: false,
-      ...(role === 'athlete' && {
-        xp: 0,
-        level: 1,
-        coins: 50,
-        streak: 0
-      })
-    };
-
-    // Save user to both current user and all users list
-    setUser(newUser);
-    saveUser(newUser);
-    
-    // Save to all users list
-    const updatedUsers = [...registeredUsers, newUser];
-    localStorage.setItem('talent_track_all_users', JSON.stringify(updatedUsers));
-    
-    // Save password (in real app, this would be hashed)
-    localStorage.setItem(`talent_track_password_${newUser.id}`, password);
-    
-    setShowTutorial(true);
   };
 
   const logout = () => {

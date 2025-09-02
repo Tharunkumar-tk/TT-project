@@ -52,50 +52,70 @@ const VideoUpload: React.FC = () => {
       name: 'Vertical Jump', 
       icon: '🦘', 
       description: 'Measure your jump height',
-      demoGif: '/challenge-demos/ssvid.net--Vertical-Jump_v720P (online-video-cutter.com).gif',
-      instructions: 'Stand with feet shoulder-width apart, jump as high as possible with arms extended upward. Make sure the camera captures your full body and the ground reference.',
-      postureGuide: 'Camera should be positioned 3-4 meters away at waist height. Ensure full body is visible from head to toe. Jump straight up with arms reaching overhead.',
-      angleGuide: 'Side view (90° angle) works best for measuring jump height. Avoid front or back angles.'
+      demoGif: 'https://images.pexels.com/photos/4662438/pexels-photo-4662438.jpeg?auto=compress&cs=tinysrgb&w=400',
+      instructions: [
+        'Stand straight with feet shoulder-width apart',
+        'Keep your arms relaxed at your sides',
+        'Bend knees slightly before lift-off',
+        'Jump as high as possible with arms up',
+        'Land softly on both feet'
+      ]
     },
     { 
       id: 'shuttle' as TestType, 
       name: 'Shuttle Run', 
       icon: '🏃', 
       description: 'Test your agility and speed',
-      demoGif: '/challenge-demos/ssvid.net--Shuttle-Run_1080p (online-video-cutter.com) (1).gif',
-      instructions: 'Set up two markers 10 meters apart. Run between them, touching each line. Complete 4 rounds as fast as possible. Camera should capture the full running path.',
-      postureGuide: 'Maintain low center of gravity when changing direction. Touch the line with your hand at each turn.',
-      angleGuide: 'Position camera to capture the full 10-meter distance. Side angle preferred to see full running motion.'
+      demoGif: 'https://images.pexels.com/photos/2803158/pexels-photo-2803158.jpeg?auto=compress&cs=tinysrgb&w=400',
+      instructions: [
+        'Set up two markers 10 meters apart',
+        'Start at one marker in ready position',
+        'Sprint to opposite marker and touch line',
+        'Turn quickly and sprint back',
+        'Complete 4 rounds as fast as possible'
+      ]
     },
     { 
       id: 'pushup' as TestType, 
       name: 'Push-ups', 
       icon: '💪', 
       description: 'Count your push-up reps',
-      demoGif: '/challenge-demos/ssvid.net--How-to-do-a-Push-Up-Proper-Form-Technique_1080p (online-video-cutter.com) (1).gif',
-      instructions: 'Keep body straight, lower chest to ground, push back up. Count each complete rep. Camera should show your side profile for proper form verification.',
-      postureGuide: 'Maintain straight line from head to heels. Lower chest until it nearly touches ground. Push up to full arm extension.',
-      angleGuide: 'Side view is essential for form verification. Camera should be at ground level to see proper depth.'
+      demoGif: 'https://images.pexels.com/photos/1552242/pexels-photo-1552242.jpeg?auto=compress&cs=tinysrgb&w=400',
+      instructions: [
+        'Start in plank position with hands shoulder-width apart',
+        'Keep body straight from head to heels',
+        'Lower chest until it nearly touches ground',
+        'Push back up to full arm extension',
+        'Maintain steady breathing throughout'
+      ]
     },
     { 
       id: 'situp' as TestType, 
       name: 'Sit-ups', 
       icon: '🤸', 
       description: 'Count your sit-up reps',
-      demoGif: '/challenge-demos/4921658-hd_1066_1920_25fps (online-video-cutter.com).gif',
-      instructions: 'Lie on back, knees bent, hands behind head. Lift torso to knees, lower back down. Camera should capture your full body movement.',
-      postureGuide: 'Keep knees bent at 90°, hands behind head (not pulling neck). Lift shoulder blades off ground completely.',
-      angleGuide: 'Side view captures the full range of motion best. Ensure camera shows complete up and down movement.'
+      demoGif: 'https://images.pexels.com/photos/4056723/pexels-photo-4056723.jpeg?auto=compress&cs=tinysrgb&w=400',
+      instructions: [
+        'Lie on back with knees bent at 90 degrees',
+        'Place hands lightly behind head (don\'t pull neck)',
+        'Lift shoulder blades completely off ground',
+        'Touch elbows to knees at the top',
+        'Lower back down with control'
+      ]
     },
     { 
       id: 'endurance' as TestType, 
       name: 'Endurance Run', 
       icon: '🏃‍♀️', 
       description: 'Track your running performance',
-      demoGif: '/challenge-demos/Become obsessed (online-video-cutter.com) (1).gif',
-      instructions: 'Run at steady pace for specified distance. Maintain consistent breathing rhythm. Use a fitness tracker or phone app to record distance and time.',
-      postureGuide: 'Maintain upright posture, relaxed shoulders, and consistent stride. Land on midfoot, not heel.',
-      angleGuide: 'Side view or slight diagonal angle works best. Capture full stride and running form.'
+      demoGif: 'https://images.pexels.com/photos/2294361/pexels-photo-2294361.jpeg?auto=compress&cs=tinysrgb&w=400',
+      instructions: [
+        'Start with a gentle warm-up jog',
+        'Maintain upright posture with relaxed shoulders',
+        'Keep consistent breathing rhythm',
+        'Land on midfoot, not heel',
+        'Finish with a cool-down walk'
+      ]
     },
   ];
 
@@ -402,96 +422,30 @@ const VideoUpload: React.FC = () => {
         {/* Demo & Instructions Panel */}
         {selectedTestData && (
           <Card>
-            <h2 className="text-xl font-bold text-white mb-4 flex items-center">
-              <Camera className="w-6 h-6 text-blue-500 mr-2" />
-              Demo & Instructions
-            </h2>
+            <h2 className="text-lg font-bold text-white mb-4">How to Perform {selectedTestData.name}</h2>
             
-            {/* Demo GIF */}
-            <div className="bg-gray-700 rounded-lg overflow-hidden mb-4">
+            {/* Demo Image */}
+            <div className="mb-4">
               <img 
                 src={selectedTestData.demoGif}
                 alt={`${selectedTest} demo`}
-                className="w-full h-48 object-cover"
+                className="w-full h-auto rounded-lg"
               />
-              <div className="p-3 bg-gray-800">
-                <div className="text-white font-medium text-sm mb-1">
-                  Perfect {selectedTestData.name} Form
-                </div>
-                <div className="text-gray-400 text-xs">
-                  Follow this exact posture and movement
-                </div>
-              </div>
             </div>
 
-            {/* Instructions */}
-            <div className="space-y-4">
-              <div className="bg-blue-600/20 rounded-lg p-3">
-                <h4 className="text-blue-400 font-medium mb-2">📋 Exercise Instructions</h4>
-                <p className="text-gray-300 text-sm">{selectedTestData.instructions}</p>
-              </div>
-
-              <div className="bg-green-600/20 rounded-lg p-3">
-                <h4 className="text-green-400 font-medium mb-2">🎯 Posture Guide</h4>
-                <p className="text-gray-300 text-sm">{selectedTestData.postureGuide}</p>
-              </div>
-
-              <div className="bg-purple-600/20 rounded-lg p-3">
-                <h4 className="text-purple-400 font-medium mb-2">📹 Camera Angle</h4>
-                <p className="text-gray-300 text-sm">{selectedTestData.angleGuide}</p>
-              </div>
-
-              <div className="bg-yellow-600/20 rounded-lg p-3">
-                <h4 className="text-yellow-400 font-medium mb-2">💡 Quality Tips</h4>
-                <ul className="text-gray-300 text-sm space-y-1">
-                  <li>• Ensure good lighting (natural light preferred)</li>
-                  <li>• Keep camera stable (use tripod or stable surface)</li>
-                  <li>• Wear contrasting colors against background</li>
-                  <li>• Record in landscape mode for better analysis</li>
-                </ul>
-              </div>
-            </div>
-          </Card>
-        )}
-      </div>
-
-      {/* Demo Modal */}
-      {showDemo && selectedTestData && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-800 rounded-xl border border-gray-700 w-full max-w-4xl max-h-[90vh] overflow-hidden">
-            <div className="flex justify-between items-center p-4 border-b border-gray-700">
-              <h3 className="text-xl font-bold text-white">{selectedTestData.name} Demo</h3>
-              <button
-                onClick={() => setShowDemo(false)}
-                className="text-gray-400 hover:text-white"
-              >
-                <X className="w-6 h-6" />
-              </button>
-            </div>
-            <div className="p-6">
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <img 
-                    src={selectedTestData.demoGif}
-                    alt={`${selectedTest} demo`}
-                    className="w-full rounded-lg"
-                  />
-                </div>
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="text-white font-medium mb-2">Exercise Instructions</h4>
-                    <p className="text-gray-300 text-sm">{selectedTestData.instructions}</p>
-                  </div>
-                  <div>
-                    <h4 className="text-white font-medium mb-2">Posture Guide</h4>
-                    <p className="text-gray-300 text-sm">{selectedTestData.postureGuide}</p>
-                  </div>
-                  <div>
-                    <h4 className="text-white font-medium mb-2">Camera Positioning</h4>
-                    <p className="text-gray-300 text-sm">{selectedTestData.angleGuide}</p>
-                  </div>
-                </div>
-              </div>
+            {/* 5-Point Instructions */}
+            <div className="bg-blue-600/20 rounded-lg p-4">
+              <h4 className="text-blue-400 font-medium mb-3">Step-by-Step Instructions</h4>
+              <ol className="space-y-2">
+                {selectedTestData.instructions.map((instruction, index) => (
+                  <li key={index} className="flex items-start space-x-2">
+                    <span className="bg-blue-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
+                      {index + 1}
+                    </span>
+                    <span className="text-gray-300 text-sm">{instruction}</span>
+                  </li>
+                ))}
+              </ol>
             </div>
           </div>
         </div>
@@ -549,15 +503,16 @@ const VideoUpload: React.FC = () => {
                 <p className="text-gray-400 text-sm">Follow the demo exactly for best results</p>
               </div>
             </div>
-            <div className="grid md:grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="text-purple-400 font-medium">Required Posture:</span>
-                <p className="text-gray-300">{selectedTestData.postureGuide}</p>
-              </div>
-              <div>
-                <span className="text-purple-400 font-medium">Camera Setup:</span>
-                <p className="text-gray-300">{selectedTestData.angleGuide}</p>
-              </div>
+            <div className="space-y-2">
+              <span className="text-purple-400 font-medium text-sm">Key Points:</span>
+              <ul className="space-y-1">
+                {selectedTestData.instructions.slice(0, 3).map((instruction, index) => (
+                  <li key={index} className="text-gray-300 text-sm flex items-start space-x-2">
+                    <span className="text-purple-400">•</span>
+                    <span>{instruction}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </Card>
@@ -566,25 +521,66 @@ const VideoUpload: React.FC = () => {
       {/* Demo & Instructions - Moved to separate section */}
       {selectedTestData && !showDemo && (
         <div className="lg:hidden">
-          {selectedTestData && (
-            <Card>
-              <h3 className="text-lg font-bold text-white mb-3 flex items-center">
-                <Camera className="w-5 h-5 text-blue-500 mr-2" />
-                Demo & Instructions
-              </h3>
-              <div className="bg-gray-700 rounded-lg overflow-hidden">
-                <img 
-                  src={selectedTestData.demoGif}
-                  alt={`${selectedTest} demo`}
-                  className="w-full h-48 object-cover"
-                />
-                <div className="p-4">
-                  <div className="text-white font-medium mb-2">
-                    How to perform {selectedTestData.name}
-                  </div>
-                  <p className="text-gray-300 text-sm">
-                    {selectedTestData.instructions}
-                  </p>
+          <Card>
+            <h3 className="text-lg font-bold text-white mb-3">How to Perform {selectedTestData.name}</h3>
+            <div className="mb-4">
+              <img 
+                src={selectedTestData.demoGif}
+                alt={`${selectedTest} demo`}
+                className="w-full h-auto rounded-lg"
+              />
+            </div>
+            <div className="bg-blue-600/20 rounded-lg p-4">
+              <h4 className="text-blue-400 font-medium mb-3">Instructions</h4>
+              <ol className="space-y-2">
+                {selectedTestData.instructions.map((instruction, index) => (
+                  <li key={index} className="flex items-start space-x-2">
+                    <span className="bg-blue-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
+                      {index + 1}
+                    </span>
+                    <span className="text-gray-300 text-sm">{instruction}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {/* Demo Modal */}
+      {showDemo && selectedTestData && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800 rounded-xl border border-gray-700 w-full max-w-4xl max-h-[90vh] overflow-hidden">
+            <div className="flex justify-between items-center p-4 border-b border-gray-700">
+              <h3 className="text-xl font-bold text-white">{selectedTestData.name} Demo</h3>
+              <button
+                onClick={() => setShowDemo(false)}
+                className="text-gray-400 hover:text-white"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            <div className="p-6">
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <img 
+                    src={selectedTestData.demoGif}
+                    alt={`${selectedTest} demo`}
+                    className="w-full h-auto rounded-lg"
+                  />
+                </div>
+                <div>
+                  <h4 className="text-white font-medium mb-4">Step-by-Step Instructions</h4>
+                  <ol className="space-y-3">
+                    {selectedTestData.instructions.map((instruction, index) => (
+                      <li key={index} className="flex items-start space-x-3">
+                        <span className="bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">
+                          {index + 1}
+                        </span>
+                        <span className="text-gray-300">{instruction}</span>
+                      </li>
+                    ))}
+                  </ol>
                 </div>
               </div>
             </Card>
