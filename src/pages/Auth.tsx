@@ -54,7 +54,7 @@ const Auth: React.FC = () => {
           <div className="text-center mb-8">
             <Trophy className="w-12 h-12 text-purple-500 mx-auto mb-4" />
             <h2 className="text-3xl font-bold text-white">
-              {isLogin ? 'Welcome Back' : 'Join SportsTalent AI'}
+              {isLogin ? 'Welcome Back' : 'Join Talent Track'}
             </h2>
             <p className="text-gray-400 mt-2">
               {isLogin ? 'Sign in to your account' : 'Create your account and start your journey'}

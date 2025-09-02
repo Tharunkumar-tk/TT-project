@@ -14,8 +14,7 @@ const Landing: React.FC = () => {
               <Trophy className="w-20 h-20 text-purple-500" />
             </div>
             <h1 className="text-6xl font-bold text-white mb-6 leading-tight">
-              AI-Powered Sports
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-green-400"> Talent Assessment</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-green-400">Talent Track</span>
             </h1>
             <p className="text-xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed">
               Transform your athletic potential with AI-driven performance analysis, gamified challenges, and personalized coaching. Upload videos, earn badges, and compete with athletes worldwide.
@@ -49,7 +48,7 @@ const Landing: React.FC = () => {
       <div className="py-20 px-6">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-4xl font-bold text-white text-center mb-16">
-            Why Choose SportsTalent AI?
+            Why Choose Talent Track?
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="bg-gray-800 p-8 rounded-xl border border-gray-700 hover:border-purple-500 transition-colors">
