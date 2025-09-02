@@ -54,7 +54,7 @@ const Roadmap: React.FC = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-white mb-2">Badge Roadmap</h1>
-          <p className="text-gray-400">Track your progress through all available achievements</p>
+          <p className="text-gray-400">Track your progress through all 30 available achievements</p>
         </div>
         <div className="text-right">
           <div className="text-sm text-gray-400">Progress</div>
