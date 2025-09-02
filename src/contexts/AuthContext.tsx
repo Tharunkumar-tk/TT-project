@@ -55,7 +55,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const registeredUsers = JSON.parse(localStorage.getItem('talent_track_all_users') || '[]');
     
     // Find user by email
-    const existingUser = registeredUsers.find((u: UserProfile) => u.email === email);
+    const existingUser = registeredUsers.find((u: UserProfile) => u.email.toLowerCase() === email.toLowerCase());
     
     if (!existingUser) {
       setAuthError({
@@ -97,7 +97,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     
     // Check if email already exists
     const registeredUsers = JSON.parse(localStorage.getItem('talent_track_all_users') || '[]');
-    const existingUser = registeredUsers.find((u: UserProfile) => u.email === email);
+    const existingUser = registeredUsers.find((u: UserProfile) => u.email.toLowerCase() === email.toLowerCase());
     
     if (existingUser) {
       setAuthError({
@@ -109,7 +109,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     const newUser: UserProfile = {
       id: Date.now().toString(),
-      email,
+      email: email.toLowerCase(),
       name,
       role,
       avatar: getRandomIndianAvatar(),
