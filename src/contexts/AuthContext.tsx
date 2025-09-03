@@ -52,44 +52,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setAuthError(null);
     
     try {
-      // Load all registered users from storage
-      const registeredUsers = JSON.parse(localStorage.getItem('talent_track_all_users') || '[]');
-      
-      // Find user by email (case-insensitive)
-      const existingUser = registeredUsers.find((u: UserProfile) => 
-        u.email.toLowerCase() === email.toLowerCase()
-      );
-      
-      if (!existingUser) {
-        setAuthError({
-          type: 'account_not_found',
-          message: "Account doesn't exist."
-        });
-        throw new Error('Account not found');
-      }
+      // Simple login - create user with provided credentials
+      const newUser: UserProfile = {
+        id: Date.now().toString(),
+        email: email.toLowerCase(),
+        name: email.split('@')[0], // Use email prefix as name
+        role,
+        avatar: getRandomIndianAvatar(),
+        onboardingComplete: false,
+        profileComplete: false,
+        ...(role === 'athlete' && {
+          xp: 0,
+          level: 1,
+          coins: 50,
+          streak: 0
+        })
+      };
 
-      // Check password (in real app, this would be hashed)
-      const storedPassword = localStorage.getItem(`talent_track_password_${existingUser.id}`);
-      if (storedPassword !== password) {
-        setAuthError({
-          type: 'incorrect_password',
-          message: "Incorrect password."
-        });
-        throw new Error('Incorrect password');
-      }
-
-      // Check role matches
-      if (existingUser.role !== role) {
-        setAuthError({
-          type: 'general',
-          message: `This account is registered as a ${existingUser.role}. Please select the correct role.`
-        });
-        throw new Error('Role mismatch');
-      }
-
-      // Login successful - ensure persistence
-      setUser(existingUser);
-      saveUser(existingUser);
+      setUser(newUser);
+      saveUser(newUser);
       
       // Clear any existing errors
       setAuthError(null);
