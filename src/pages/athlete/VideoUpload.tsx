@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Upload, Video, CheckCircle, AlertCircle, ArrowLeft, Target, Play } from 'lucide-react';
+import { Upload, Video, CheckCircle, AlertCircle, ArrowLeft, Target, Play, Camera, Sparkles, Zap } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useGame } from '../../contexts/GameContext';
 import Card from '../../components/UI/Card';
@@ -261,51 +261,98 @@ export const VideoUpload: React.FC<VideoUploadProps> = () => {
           <Card>
             {uploadStatus === 'idle' && (
               <div>
-                <h2 className="text-xl font-bold text-white mb-4 flex items-center">
-                  <Upload className="w-6 h-6 text-blue-500 mr-2" />
-                  Upload Your Video
+                <h2 className="text-2xl font-bold text-white mb-6 flex items-center justify-center">
+                  <div className="bg-gradient-to-r from-purple-500 to-blue-500 p-3 rounded-xl mr-3">
+                    <Camera className="w-8 h-8 text-white" />
+                  </div>
+                  {currentDemo ? `${currentDemo.name} Analysis` : 'AI Performance Analysis'}
                 </h2>
-                <div className="border-2 border-dashed border-gray-600 rounded-lg p-8 hover:border-purple-500 transition-colors text-center">
-                  <Video className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-white mb-2">
-                    {currentDemo ? `Upload ${currentDemo.name} Video` : 'Upload Training Video'}
+                
+                <div className="relative overflow-hidden border-2 border-dashed border-gray-600 rounded-2xl p-8 md:p-12 hover:border-purple-500 transition-all duration-300 text-center bg-gradient-to-br from-gray-800/50 to-gray-900/50">
+                  {/* Background Pattern */}
+                  <div className="absolute inset-0 opacity-5">
+                    <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-blue-500"></div>
+                  </div>
+                  
+                  <div className="relative z-10">
+                    <div className="bg-gradient-to-r from-purple-600 to-blue-600 w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl">
+                      <Video className="w-10 h-10 md:w-12 md:h-12 text-white" />
+                    </div>
+                    
+                    <h3 className="text-xl md:text-2xl font-bold text-white mb-3">
+                      {currentDemo ? `Upload ${currentDemo.name} Video` : 'Upload Training Video'}
+                    </h3>
+                    
+                    <p className="text-gray-300 mb-8 text-sm md:text-base max-w-md mx-auto leading-relaxed">
+                      {currentDemo 
+                        ? `Record yourself performing ${currentDemo.name.toLowerCase()} and get instant AI feedback on your form and performance` 
+                        : 'Get instant AI-powered analysis of your technique, form, and performance metrics'
+                      }
+                    </p>
+                    
+                    <div className="flex flex-col sm:flex-row gap-4 items-center justify-center mb-6">
+                      <div className="flex items-center space-x-2 text-sm text-purple-300">
+                        <Sparkles className="w-4 h-4" />
+                        <span>AI-Powered Analysis</span>
+                      </div>
+                      <div className="flex items-center space-x-2 text-sm text-green-300">
+                        <Zap className="w-4 h-4" />
+                        <span>Instant Feedback</span>
+                      </div>
+                      <div className="flex items-center space-x-2 text-sm text-yellow-300">
+                        <span>🏆</span>
+                        <span>Earn Rewards</span>
+                      </div>
+                    </div>
+                    
+                    <input
+                      type="file"
+                      accept="video/*"
+                      onChange={handleFileSelect}
+                      className="hidden"
+                      id="video-upload"
+                    />
+                    <label
+                      htmlFor="video-upload"
+                      className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white text-lg font-semibold rounded-xl hover:from-purple-700 hover:to-blue-700 cursor-pointer transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+                    >
+                      <Upload className="w-6 h-6 mr-3" />
+                      Choose Video File
+                    </label>
+                    
+                    <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs text-gray-400 max-w-lg mx-auto">
+                      <div className="flex items-center justify-center space-x-1">
+                        <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                        <span>MP4, MOV, AVI</span>
+                      </div>
+                      <div className="flex items-center justify-center space-x-1">
+                        <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                        <span>Max 100MB</span>
+                      </div>
+                      <div className="flex items-center justify-center space-x-1">
+                        <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+                        <span>HD Quality</span>
+                      </div>
+                    </div>
                   </h3>
-                  <p className="text-gray-400 mb-6">
-                    {currentDemo ? `Record yourself performing ${currentDemo.name.toLowerCase()} and upload for AI analysis` : 'Select a video file to upload for analysis'}
-                  </p>
-                  
-                  <input
-                    type="file"
-                    accept="video/*"
-                    onChange={handleFileSelect}
-                    className="hidden"
-                    id="video-upload"
-                  />
-                  <label
-                    htmlFor="video-upload"
-                    className="inline-flex items-center px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 cursor-pointer transition-colors"
-                  >
-                    <Upload className="w-5 h-5 mr-2" />
-                    Choose Video File
-                  </label>
-                  
-                  <div className="mt-4 text-sm text-gray-500">
-                    Supported formats: MP4, MOV, AVI • Max size: 100MB
                   </div>
                 </div>
 
                 {selectedFile && (
-                  <div className="mt-6 p-4 bg-gray-700 rounded-lg">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <Video className="w-5 h-5 text-purple-400 mr-2" />
-                        <span className="text-sm font-medium text-white">{selectedFile.name}</span>
-                      </div>
+                  <div className="mt-6 p-4 md:p-6 bg-gradient-to-r from-gray-700 to-gray-800 rounded-xl border border-gray-600">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                       <div className="flex items-center space-x-3">
-                        <span className="text-sm text-gray-400">
-                          {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB
-                        </span>
-                        <Button onClick={handleUpload}>
+                        <Video className="w-5 h-5 text-purple-400 mr-2" />
+                        <div>
+                          <div className="text-sm font-medium text-white truncate max-w-48">{selectedFile.name}</div>
+                          <div className="text-xs text-gray-400">
+                            {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB
+                          </div>
+                        </div>
+                      </div>
+                      <div className="w-full sm:w-auto">
+                        <Button onClick={handleUpload} className="w-full sm:w-auto bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800">
+                          <Sparkles className="w-4 h-4 mr-2" />
                           Analyze Video
                         </Button>
                       </div>
@@ -317,11 +364,18 @@ export const VideoUpload: React.FC<VideoUploadProps> = () => {
 
             {uploadStatus === 'uploading' && (
               <div className="text-center py-12">
-                <div className="animate-spin w-12 h-12 border-4 border-purple-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-                <h3 className="text-lg font-semibold text-white mb-2">Uploading Video...</h3>
-                <p className="text-gray-400">Please wait while we upload your video</p>
-                <div className="w-full bg-gray-700 rounded-full h-2 mt-4">
-                  <div className="bg-purple-600 h-2 rounded-full animate-pulse" style={{ width: '60%' }}></div>
+                <div className="relative">
+                  <div className="animate-spin w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full mx-auto mb-6"></div>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Upload className="w-6 h-6 text-purple-400" />
+                  </div>
+                </div>
+                <h3 className="text-xl font-bold text-white mb-3">Uploading Video...</h3>
+                <p className="text-gray-400 mb-6">Securely transferring your video to our AI servers</p>
+                <div className="max-w-xs mx-auto">
+                  <div className="w-full bg-gray-700 rounded-full h-3 overflow-hidden">
+                    <div className="bg-gradient-to-r from-purple-600 to-blue-600 h-3 rounded-full animate-pulse transition-all duration-1000" style={{ width: '75%' }}></div>
+                  </div>
                 </div>
               </div>
             )}
@@ -330,16 +384,20 @@ export const VideoUpload: React.FC<VideoUploadProps> = () => {
               <div className="text-center py-12">
                 <div className="relative">
                   <div className="animate-pulse w-16 h-16 bg-gradient-to-r from-purple-600 to-green-600 rounded-full mx-auto mb-4 flex items-center justify-center">
-                    <Video className="w-8 h-8 text-white" />
+                    <Sparkles className="w-8 h-8 text-white" />
                   </div>
-                  <div className="absolute inset-0 animate-ping w-16 h-16 bg-purple-600/30 rounded-full mx-auto"></div>
+                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 animate-ping w-16 h-16 bg-purple-600/30 rounded-full"></div>
                 </div>
-                <h3 className="text-lg font-semibold text-white mb-2">AI Analysis in Progress...</h3>
-                <p className="text-gray-400">Our AI is analyzing your {currentDemo?.name.toLowerCase() || 'performance'}</p>
-                <div className="flex justify-center space-x-1 mt-4">
-                  <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce"></div>
-                  <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                  <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                <h3 className="text-xl font-bold text-white mb-3">AI Analysis in Progress...</h3>
+                <p className="text-gray-400 mb-6">Our advanced AI is analyzing your {currentDemo?.name.toLowerCase() || 'performance'}</p>
+                
+                <div className="bg-gray-700 rounded-xl p-4 max-w-md mx-auto mb-6">
+                  <div className="flex justify-center space-x-1 mb-3">
+                    <div className="w-3 h-3 bg-purple-600 rounded-full animate-bounce"></div>
+                    <div className="w-3 h-3 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                    <div className="w-3 h-3 bg-green-600 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                  </div>
+                  <p className="text-sm text-gray-300">Detecting movement patterns and counting reps...</p>
                 </div>
               </div>
             )}
@@ -347,26 +405,34 @@ export const VideoUpload: React.FC<VideoUploadProps> = () => {
             {uploadStatus === 'success' && analysisResults && (
               <div className="space-y-6">
                 <div className="text-center">
-                  <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-white mb-2">Analysis Complete!</h3>
-                  <p className="text-gray-400">Your {currentDemo?.name.toLowerCase() || 'video'} has been analyzed</p>
+                  <div className="relative">
+                    <div className="bg-gradient-to-r from-green-500 to-emerald-500 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl">
+                      <CheckCircle className="w-10 h-10 text-white" />
+                    </div>
+                    <div className="absolute inset-0 animate-ping w-20 h-20 bg-green-500/30 rounded-full mx-auto"></div>
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-3">Analysis Complete! 🎉</h3>
+                  <p className="text-gray-300">Your {currentDemo?.name.toLowerCase() || 'video'} has been successfully analyzed</p>
                 </div>
 
                 {/* Analysis Results */}
-                <div className="bg-gray-700 rounded-lg p-6">
-                  <h4 className="text-white font-bold mb-4">Performance Results</h4>
-                  <div className="grid md:grid-cols-3 gap-4 mb-4">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-purple-400">{analysisResults.measurement}</div>
-                      <div className="text-sm text-gray-400">
+                <div className="bg-gradient-to-r from-gray-700 to-gray-800 rounded-2xl p-6 border border-gray-600">
+                  <h4 className="text-xl font-bold text-white mb-6 flex items-center justify-center">
+                    <Zap className="w-6 h-6 text-yellow-400 mr-2" />
+                    Performance Results
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <div className="text-center bg-gray-800 rounded-xl p-4">
+                      <div className="text-3xl font-bold text-purple-400 mb-2">{analysisResults.measurement}</div>
+                      <div className="text-sm text-gray-300 font-medium">
                         {activityType === 'jump' ? 'Jump Height' :
                          activityType === 'shuttle' ? 'Best Time' :
                          activityType === 'pushup' || activityType === 'situp' ? 'Reps Counted' :
                          activityType === 'endurance' ? 'Distance' : 'Result'}
                       </div>
                     </div>
-                    <div className="text-center">
-                      <div className={`text-2xl font-bold ${
+                    <div className="text-center bg-gray-800 rounded-xl p-4">
+                      <div className={`text-3xl font-bold mb-2 ${
                         analysisResults.rating === 'Excellent' ? 'text-green-400' :
                         analysisResults.rating === 'Good' ? 'text-yellow-400' : 'text-orange-400'
                       }`}>
@@ -374,8 +440,8 @@ export const VideoUpload: React.FC<VideoUploadProps> = () => {
                       </div>
                       <div className="text-sm text-gray-400">Form Rating</div>
                     </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-blue-400">
+                    <div className="text-center bg-gray-800 rounded-xl p-4">
+                      <div className="text-3xl font-bold text-blue-400 mb-2">
                         {Math.floor((analysisResults.count / analysisResults.target) * 100)}%
                       </div>
                       <div className="text-sm text-gray-400">Challenge Progress</div>
@@ -383,21 +449,26 @@ export const VideoUpload: React.FC<VideoUploadProps> = () => {
                   </div>
 
                   <div className="bg-gray-800 rounded-lg p-4 mb-4">
-                    <h5 className="text-white font-medium mb-2">AI Feedback</h5>
-                    <p className="text-gray-300 text-sm">{analysisResults.feedback}</p>
+                    <h5 className="text-white font-bold mb-3 flex items-center">
+                      <Sparkles className="w-5 h-5 text-blue-400 mr-2" />
+                      AI Feedback
+                    </h5>
+                    <p className="text-gray-200 leading-relaxed">{analysisResults.feedback}</p>
                   </div>
 
-                  <div className="flex justify-center space-x-6 text-sm">
-                    <div className="flex items-center space-x-1">
-                      <span className="text-yellow-400">+{analysisResults.xpEarned} XP</span>
+                  <div className="flex flex-col sm:flex-row justify-center gap-4 text-center">
+                    <div className="bg-yellow-600/20 rounded-xl px-4 py-3 flex items-center justify-center space-x-2">
+                      <Zap className="w-5 h-5 text-yellow-400" />
+                      <span className="text-yellow-400 font-bold">+{analysisResults.xpEarned} XP</span>
                     </div>
-                    <div className="flex items-center space-x-1">
-                      <span className="text-green-400">+{analysisResults.coinsEarned} 🪙</span>
+                    <div className="bg-green-600/20 rounded-xl px-4 py-3 flex items-center justify-center space-x-2">
+                      <span className="text-2xl">🪙</span>
+                      <span className="text-green-400 font-bold">+{analysisResults.coinsEarned} Coins</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex gap-3">
+                <div className="flex flex-col sm:flex-row gap-3">
                   <Button onClick={resetUpload} variant="secondary" className="flex-1">
                     Upload Another
                   </Button>
@@ -410,10 +481,15 @@ export const VideoUpload: React.FC<VideoUploadProps> = () => {
 
             {uploadStatus === 'error' && (
               <div className="text-center py-12">
-                <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-white mb-2">Upload Failed</h3>
-                <p className="text-gray-400 mb-6">There was an error processing your video. Please try again.</p>
+                <div className="bg-red-500 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <AlertCircle className="w-10 h-10 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-3">Upload Failed</h3>
+                <p className="text-gray-400 mb-6 max-w-md mx-auto">
+                  There was an error processing your video. Please check your internet connection and try again.
+                </p>
                 <Button onClick={resetUpload} variant="secondary">
+                  <Upload className="w-4 h-4 mr-2" />
                   Try Again
                 </Button>
               </div>
@@ -426,13 +502,13 @@ export const VideoUpload: React.FC<VideoUploadProps> = () => {
           <div className="space-y-6">
             {/* Activity Demo */}
             <Card>
-              <h3 className="text-lg font-bold text-white mb-4 flex items-center">
+              <h3 className="text-xl font-bold text-white mb-4 flex items-center">
                 <Play className="w-5 h-5 text-green-500 mr-2" />
                 {currentDemo.name} Demo
               </h3>
               
               {/* GIF Display - Full View */}
-              <div className="mb-4 bg-gray-900 rounded-lg overflow-hidden">
+              <div className="mb-6 bg-gray-900 rounded-xl overflow-hidden border border-gray-700">
                 <img 
                   src={currentDemo.gif} 
                   alt={`${currentDemo.name} demonstration`}
@@ -443,14 +519,14 @@ export const VideoUpload: React.FC<VideoUploadProps> = () => {
 
               {/* Instructions */}
               <div>
-                <h4 className="text-white font-medium mb-3">Proper Technique:</h4>
+                <h4 className="text-white font-bold mb-4">Proper Technique:</h4>
                 <ol className="space-y-2">
                   {currentDemo.instructions.map((instruction, index) => (
                     <li key={index} className="flex items-start space-x-3">
                       <span className="flex-shrink-0 w-6 h-6 bg-purple-600 text-white rounded-full flex items-center justify-center text-sm font-medium">
                         {index + 1}
                       </span>
-                      <span className="text-gray-300 text-sm">{instruction}</span>
+                      <span className="text-gray-200">{instruction}</span>
                     </li>
                   ))}
                 </ol>
@@ -459,7 +535,10 @@ export const VideoUpload: React.FC<VideoUploadProps> = () => {
 
             {/* Tips */}
             <Card>
-              <h4 className="text-white font-medium mb-3">📱 Recording Tips</h4>
+              <h4 className="text-white font-bold mb-4 flex items-center">
+                <Camera className="w-5 h-5 text-blue-400 mr-2" />
+                Recording Tips
+              </h4>
               <ul className="space-y-2 text-sm text-gray-300">
                 <li className="flex items-start space-x-2">
                   <span className="text-green-400">•</span>
@@ -486,7 +565,7 @@ export const VideoUpload: React.FC<VideoUploadProps> = () => {
         {!currentDemo && (
           <div className="space-y-6">
             <Card>
-              <h3 className="text-lg font-bold text-white mb-4">Upload Guidelines</h3>
+              <h3 className="text-xl font-bold text-white mb-4">Upload Guidelines</h3>
               <div className="space-y-3 text-sm text-gray-300">
                 <div className="flex items-start space-x-2">
                   <span className="text-green-400">✓</span>
@@ -512,7 +591,7 @@ export const VideoUpload: React.FC<VideoUploadProps> = () => {
             </Card>
 
             <Card>
-              <h4 className="text-white font-medium mb-3">Available Activities</h4>
+              <h4 className="text-white font-bold mb-4">Available Activities</h4>
               <div className="grid grid-cols-2 gap-2">
                 {Object.values(activityDemos).map(demo => (
                   <button

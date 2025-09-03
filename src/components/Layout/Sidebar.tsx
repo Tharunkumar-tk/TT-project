@@ -39,21 +39,22 @@ const Sidebar: React.FC = () => {
   const links = user.role === 'athlete' ? athleteLinks : coachLinks;
 
   return (
-    <aside className="w-64 bg-gray-900 border-r border-gray-800 min-h-screen">
-      <div className="p-6">
+    <aside className="w-16 md:w-64 bg-gray-900 border-r border-gray-800 min-h-screen">
+      <div className="p-3 md:p-6">
         <nav className="space-y-2">
           {links.map(({ to, icon: Icon, label }) => (
             <Link
               key={to}
               to={to}
-              className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+              className={`w-full flex items-center justify-center md:justify-start space-x-0 md:space-x-3 px-2 md:px-4 py-3 rounded-lg transition-colors ${
                 location.pathname === to
                   ? 'bg-purple-600 text-white'
                   : 'text-gray-300 hover:bg-gray-800 hover:text-white'
               }`}
+              title={label}
             >
               <Icon className="w-5 h-5" />
-              <span className="font-medium">{label}</span>
+              <span className="font-medium hidden md:block">{label}</span>
             </Link>
           ))}
         </nav>

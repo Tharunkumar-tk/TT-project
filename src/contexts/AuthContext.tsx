@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { saveUser, loadUser, UserProfile, saveTutorialComplete, loadTutorialComplete } from '../utils/storage';
+import CoinNotification from '../components/UI/CoinNotification';
 
 interface AuthError {
   type: 'account_not_found' | 'incorrect_password' | 'general';
@@ -18,6 +19,7 @@ interface AuthContextType {
   setShowOnboarding: (show: boolean) => void;
   authError: AuthError | null;
   clearAuthError: () => void;
+  showCoinNotification: (amount: number) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -39,6 +41,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [showTutorial, setShowTutorial] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [authError, setAuthError] = useState<AuthError | null>(null);
+  const [coinNotification, setCoinNotification] = useState<number | null>(null);
 
   // Load user from storage on app start
   useEffect(() => {
@@ -148,6 +151,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const updateUser = (updates: Partial<UserProfile>) => {
     if (user) {
       const updatedUser = { ...user, ...updates };
+      
+      // Check if coins increased and show notification
+      if (updates.coins && user.coins && updates.coins > user.coins) {
+        const coinsGained = updates.coins - user.coins;
+        setCoinNotification(coinsGained);
+      }
+      
       setUser(updatedUser);
       saveUser(updatedUser);
       
@@ -162,6 +172,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const clearAuthError = () => {
     setAuthError(null);
+  };
+
+  const showCoinNotification = (amount: number) => {
+    setCoinNotification(amount);
   };
 
   const getRandomIndianAvatar = () => {
@@ -186,12 +200,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     showOnboarding,
     setShowOnboarding,
     authError,
-    clearAuthError
+    clearAuthError,
+    showCoinNotification
   };
 
   return (
     <AuthContext.Provider value={value}>
       {children}
+      {coinNotification && (
+        <CoinNotification
+          amount={coinNotification}
+          onComplete={() => setCoinNotification(null)}
+        />
+      )}
     </AuthContext.Provider>
   );
 };

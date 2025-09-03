@@ -45,21 +45,23 @@ const AthleteDashboard: React.FC = () => {
       </div>
 
       {/* Stats Overview */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         <Card>
           <div className="flex items-center justify-between">
             <div>
-              <div className="flex items-center space-x-2 mb-1">
+              <div className="flex items-center space-x-1 md:space-x-2 mb-1">
                 <Zap className="w-5 h-5 text-yellow-400" />
-                <span className="text-gray-400 text-sm">Total XP</span>
+                <span className="text-gray-400 text-xs md:text-sm hidden sm:block">Total XP</span>
+                <span className="text-gray-400 text-xs md:text-sm sm:hidden">XP</span>
               </div>
-              <div className="text-2xl font-bold text-white">{user.xp}</div>
-              <div className="text-sm text-green-400 flex items-center">
+              <div className="text-xl md:text-2xl font-bold text-white">{user.xp}</div>
+              <div className="text-xs md:text-sm text-green-400 flex items-center">
                 <TrendingUp className="w-3 h-3 mr-1" />
-                +125 this week
+                <span className="hidden sm:inline">+125 this week</span>
+                <span className="sm:hidden">+125</span>
               </div>
             </div>
-            <div className="bg-yellow-600/20 p-3 rounded-lg">
+            <div className="bg-yellow-600/20 p-2 md:p-3 rounded-lg hidden md:block">
               <Zap className="w-6 h-6 text-yellow-400" />
             </div>
           </div>
@@ -68,17 +70,18 @@ const AthleteDashboard: React.FC = () => {
         <Card>
           <div className="flex items-center justify-between">
             <div>
-              <div className="flex items-center space-x-2 mb-1">
+              <div className="flex items-center space-x-1 md:space-x-2 mb-1">
                 <span className="text-green-400">🪙</span>
-                <span className="text-gray-400 text-sm">Coins</span>
+                <span className="text-gray-400 text-xs md:text-sm">Coins</span>
               </div>
-              <div className="text-2xl font-bold text-white">{user.coins}</div>
-              <div className="text-sm text-green-400 flex items-center">
+              <div className="text-xl md:text-2xl font-bold text-white">{user.coins}</div>
+              <div className="text-xs md:text-sm text-green-400 flex items-center">
                 <TrendingUp className="w-3 h-3 mr-1" />
-                +45 this week
+                <span className="hidden sm:inline">+45 this week</span>
+                <span className="sm:hidden">+45</span>
               </div>
             </div>
-            <div className="bg-green-600/20 p-3 rounded-lg">
+            <div className="bg-green-600/20 p-2 md:p-3 rounded-lg hidden md:block">
               <span className="text-2xl">🪙</span>
             </div>
           </div>
@@ -87,14 +90,17 @@ const AthleteDashboard: React.FC = () => {
         <Card>
           <div className="flex items-center justify-between">
             <div>
-              <div className="flex items-center space-x-2 mb-1">
+              <div className="flex items-center space-x-1 md:space-x-2 mb-1">
                 <span className="text-orange-400">🔥</span>
-                <span className="text-gray-400 text-sm">Streak</span>
+                <span className="text-gray-400 text-xs md:text-sm">Streak</span>
               </div>
-              <div className="text-2xl font-bold text-white">{user.streak} days</div>
-              <div className="text-sm text-orange-400">Keep it up!</div>
+              <div className="text-xl md:text-2xl font-bold text-white">{user.streak} days</div>
+              <div className="text-xs md:text-sm text-orange-400">
+                <span className="hidden sm:inline">Keep it up!</span>
+                <span className="sm:hidden">🚀</span>
+              </div>
             </div>
-            <div className="bg-orange-600/20 p-3 rounded-lg">
+            <div className="bg-orange-600/20 p-2 md:p-3 rounded-lg hidden md:block">
               <span className="text-2xl">🔥</span>
             </div>
           </div>
@@ -103,21 +109,24 @@ const AthleteDashboard: React.FC = () => {
         <Card>
           <div className="flex items-center justify-between">
             <div>
-              <div className="flex items-center space-x-2 mb-1">
+              <div className="flex items-center space-x-1 md:space-x-2 mb-1">
                 <Award className="w-5 h-5 text-purple-400" />
-                <span className="text-gray-400 text-sm">Badges</span>
+                <span className="text-gray-400 text-xs md:text-sm">Badges</span>
               </div>
-              <div className="text-2xl font-bold text-white">{badges.filter(b => b.unlocked).length}</div>
-              <div className="text-sm text-purple-400">Unlocked</div>
+              <div className="text-xl md:text-2xl font-bold text-white">{badges.filter(b => b.unlocked).length}</div>
+              <div className="text-xs md:text-sm text-purple-400">
+                <span className="hidden sm:inline">Unlocked</span>
+                <span className="sm:hidden">🏆</span>
+              </div>
             </div>
-            <div className="bg-purple-600/20 p-3 rounded-lg">
+            <div className="bg-purple-600/20 p-2 md:p-3 rounded-lg hidden md:block">
               <Award className="w-6 h-6 text-purple-400" />
             </div>
           </div>
         </Card>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid lg:grid-cols-3 gap-4 md:gap-6">
         {/* Active Challenges */}
         <div className="lg:col-span-2">
           <Card>
@@ -126,23 +135,26 @@ const AthleteDashboard: React.FC = () => {
                 <Target className="w-6 h-6 text-green-500 mr-2" />
                 Active Challenges
               </h2>
-              <Link to="/athlete/challenges">
+              <Link to="/athlete/challenges" className="hidden sm:block">
                 <Button variant="secondary" size="sm">View All</Button>
               </Link>
             </div>
             
             <div className="space-y-4">
               {activeChallenges.slice(0, 3).map((challenge) => (
-                <div key={challenge.id} className="bg-gray-700 rounded-lg p-4">
+                <div key={challenge.id} className="bg-gray-700 rounded-lg p-3 md:p-4">
                   <div className="flex justify-between items-start mb-3">
                     <div>
-                      <h3 className="text-white font-medium">{challenge.title}</h3>
-                      <p className="text-gray-400 text-sm">{challenge.description}</p>
+                      <h3 className="text-white font-medium text-sm md:text-base">{challenge.title}</h3>
+                      <p className="text-gray-400 text-xs md:text-sm">{challenge.description}</p>
                     </div>
-                    <div className="flex items-center space-x-1 text-sm">
+                    <div className="flex items-center space-x-1 text-xs md:text-sm">
                       <Clock className="w-4 h-4 text-yellow-400" />
-                      <span className="text-yellow-400">
+                      <span className="text-yellow-400 hidden sm:inline">
                         {challenge.type === 'daily' ? 'Today' : challenge.type === 'weekly' ? 'This week' : '5 days left'}
+                      </span>
+                      <span className="text-yellow-400 sm:hidden">
+                        {challenge.type === 'daily' ? '1d' : challenge.type === 'weekly' ? '7d' : '5d'}
                       </span>
                     </div>
                   </div>
@@ -154,12 +166,12 @@ const AthleteDashboard: React.FC = () => {
                   />
                   
                   <div className="flex justify-between items-center">
-                    <div className="text-sm text-gray-400">
+                    <div className="text-xs md:text-sm text-gray-400">
                       Progress: {challenge.progress}/{challenge.maxProgress}
                     </div>
-                    <div className="flex items-center space-x-3 text-sm">
-                      <span className="text-yellow-400">+{challenge.xpReward} XP</span>
-                      <span className="text-green-400">+{challenge.coinReward} 🪙</span>
+                    <div className="flex items-center space-x-2 md:space-x-3 text-xs md:text-sm">
+                      <span className="text-yellow-400">+{challenge.xpReward}</span>
+                      <span className="text-green-400">+{challenge.coinReward}🪙</span>
                     </div>
                   </div>
                 </div>
