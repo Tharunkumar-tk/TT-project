@@ -125,7 +125,7 @@ const Roadmap: React.FC = () => {
       </Card>
 
       {/* Badge Grid */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
         {filteredBadges.map((badge) => {
           const isUnlocked = badge.unlocked;
           const hasProgress = badge.progress > 0;
@@ -134,7 +134,7 @@ const Roadmap: React.FC = () => {
           return (
             <Card 
               key={badge.id}
-              className={`relative cursor-pointer transition-all duration-300 ${
+              className={`relative cursor-pointer transition-all duration-300 p-3 md:p-4 ${
                 isUnlocked 
                   ? `${getCategoryColor(badge.category)} shadow-lg transform hover:scale-105` 
                   : hasProgress 
@@ -149,15 +149,15 @@ const Roadmap: React.FC = () => {
               )}
 
               <div className="text-center">
-                <div className={`text-4xl mb-3 ${isUnlocked ? 'animate-bounce' : hasProgress ? '' : 'grayscale opacity-50'}`}>
+                <div className={`text-2xl md:text-4xl mb-2 md:mb-3 ${isUnlocked ? 'animate-bounce' : hasProgress ? '' : 'grayscale opacity-50'}`}>
                   {isUnlocked ? badge.icon : hasProgress ? badge.icon : '🔒'}
                 </div>
                 
-                <h3 className={`font-bold mb-2 ${isUnlocked ? 'text-white' : hasProgress ? 'text-gray-300' : 'text-gray-500'}`}>
+                <h3 className={`text-sm md:text-base font-bold mb-1 md:mb-2 ${isUnlocked ? 'text-white' : hasProgress ? 'text-gray-300' : 'text-gray-500'}`}>
                   {badge.name}
                 </h3>
                 
-                <p className={`text-sm mb-3 ${isUnlocked ? 'text-gray-200' : hasProgress ? 'text-gray-400' : 'text-gray-500'}`}>
+                <p className={`text-xs md:text-sm mb-2 md:mb-3 ${isUnlocked ? 'text-gray-200' : hasProgress ? 'text-gray-400' : 'text-gray-500'} line-clamp-2`}>
                   {badge.description}
                 </p>
 
@@ -172,25 +172,27 @@ const Roadmap: React.FC = () => {
                              badge.category === 'endurance' ? 'blue' : 'purple'}
                       showText={false}
                     />
-                    <div className="text-xs text-gray-400 mt-1">
+                    <div className="text-xs text-gray-400 mt-1 hidden md:block">
                       {badge.progress}/{badge.maxProgress}
                     </div>
                   </div>
                 )}
 
                 {/* Rewards */}
-                <div className="flex justify-center space-x-3 text-xs">
+                <div className="flex justify-center space-x-2 md:space-x-3 text-xs">
                   <div className="flex items-center space-x-1">
                     <Zap className="w-3 h-3 text-yellow-400" />
-                    <span className="text-yellow-400">+{badge.xpReward}</span>
+                    <span className="text-yellow-400 hidden sm:inline">+{badge.xpReward}</span>
+                    <span className="text-yellow-400 sm:hidden">{badge.xpReward}</span>
                   </div>
                   <div className="flex items-center space-x-1">
-                    <span className="text-green-400">+{badge.coinReward} 🪙</span>
+                    <span className="text-green-400 hidden sm:inline">+{badge.coinReward} 🪙</span>
+                    <span className="text-green-400 sm:hidden">🪙{badge.coinReward}</span>
                   </div>
                 </div>
 
                 {/* Category Tag */}
-                <div className="mt-2">
+                <div className="mt-2 hidden md:block">
                   <span className={`text-xs px-2 py-1 rounded-full ${getCategoryColor(badge.category)} ${getCategoryTextColor(badge.category)}`}>
                     {badge.category}
                   </span>

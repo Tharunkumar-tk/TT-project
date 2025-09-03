@@ -55,15 +55,15 @@ const Auth: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-purple-950 to-gray-950 flex items-center justify-center px-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-purple-950 to-gray-950 flex items-center justify-center px-4 md:px-6">
       <div className="max-w-md w-full">
-        <div className="bg-gray-800 p-8 rounded-xl border border-gray-700">
+        <div className="bg-gray-800 p-6 md:p-8 rounded-xl border border-gray-700">
           <div className="text-center mb-8">
-            <Trophy className="w-12 h-12 text-purple-500 mx-auto mb-4" />
-            <h2 className="text-3xl font-bold text-white">
+            <Trophy className="w-10 h-10 md:w-12 md:h-12 text-purple-500 mx-auto mb-4" />
+            <h2 className="text-2xl md:text-3xl font-bold text-white">
               {isLogin ? 'Welcome Back' : 'Join Talent Track'}
             </h2>
-            <p className="text-gray-400 mt-2">
+            <p className="text-gray-400 mt-2 text-sm md:text-base">
               {isLogin ? 'Sign in to your account' : 'Create your account and start your journey'}
             </p>
           </div>

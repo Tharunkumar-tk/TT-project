@@ -8,25 +8,25 @@ const Landing: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-purple-950 to-gray-950">
       {/* Hero Section */}
       <div className="relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6 py-20">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-12 md:py-20">
           <div className="text-center">
             <div className="flex justify-center mb-8">
-              <Trophy className="w-20 h-20 text-purple-500" />
+              <Trophy className="w-16 h-16 md:w-20 md:h-20 text-purple-500" />
             </div>
-            <h1 className="text-6xl font-bold text-white mb-6 leading-tight">
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-green-400">Talent Track</span>
             </h1>
-            <p className="text-xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-lg md:text-xl text-gray-300 mb-8 md:mb-12 max-w-3xl mx-auto leading-relaxed px-4">
               Transform your athletic potential with AI-driven performance analysis, gamified challenges, and personalized coaching. Upload videos, earn badges, and compete with athletes worldwide.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/auth">
-                <Button size="lg" className="text-lg px-8 py-4">
+                <Button size="lg" className="text-base md:text-lg px-6 md:px-8 py-3 md:py-4 w-full sm:w-auto">
                   Get Started as Athlete
                 </Button>
               </Link>
               <Link to="/auth?role=coach">
-                <Button variant="secondary" size="lg" className="text-lg px-8 py-4">
+                <Button variant="secondary" size="lg" className="text-base md:text-lg px-6 md:px-8 py-3 md:py-4 w-full sm:w-auto">
                   Join as Coach
                 </Button>
               </Link>
@@ -45,18 +45,18 @@ const Landing: React.FC = () => {
       </div>
 
       {/* Features Section */}
-      <div className="py-20 px-6">
+      <div className="py-12 md:py-20 px-4 md:px-6">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl font-bold text-white text-center mb-16">
+          <h2 className="text-2xl md:text-4xl font-bold text-white text-center mb-8 md:mb-16">
             Why Choose Talent Track?
           </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             <div className="bg-gray-800 p-8 rounded-xl border border-gray-700 hover:border-purple-500 transition-colors">
               <div className="flex items-center mb-4">
                 <Zap className="w-8 h-8 text-yellow-400 mr-3" />
                 <h3 className="text-xl font-bold text-white">AI Analysis</h3>
               </div>
-              <p className="text-gray-300">
+              <p className="text-gray-300 text-sm md:text-base">
                 Get instant feedback on your performance with advanced AI that detects movement patterns, counts reps, and measures athletic metrics.
               </p>
             </div>
