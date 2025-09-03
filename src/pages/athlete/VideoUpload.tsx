@@ -381,7 +381,6 @@ export const VideoUpload: React.FC<VideoUploadProps> = () => {
                   </div>
                 )}
               </div>
-              </div>
             )}
 
             {uploadStatus === 'uploading' && (
