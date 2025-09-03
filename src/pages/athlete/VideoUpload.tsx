@@ -334,7 +334,7 @@ export const VideoUpload: React.FC<VideoUploadProps> = () => {
                         <span>HD Quality</span>
                       </div>
                     </div>
-                  </h3>
+                  </div>
                   </div>
                 </div>
 
