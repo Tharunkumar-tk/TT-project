@@ -33,15 +33,15 @@ const Button: React.FC<ButtonProps> = ({
   };
   
   const sizeClasses = {
-    sm: 'px-3 py-2 text-sm',
-    md: 'px-4 py-2',
-    lg: 'px-6 py-3 text-lg'
+    sm: 'px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm',
+    md: 'px-3 sm:px-4 py-2 text-sm sm:text-base',
+    lg: 'px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base md:text-lg'
   };
 
   return (
     <button
       type={type}
-      className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
+      className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} touch-manipulation ${className}`}
       onClick={onClick}
       disabled={disabled}
     >

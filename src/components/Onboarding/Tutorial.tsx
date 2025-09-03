@@ -85,22 +85,22 @@ const Tutorial: React.FC<TutorialProps> = ({ onComplete }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-800 rounded-xl border border-gray-700 p-6 w-full max-w-lg">
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-3 sm:p-4">
+      <div className="bg-gray-800 rounded-lg sm:rounded-xl border border-gray-700 p-4 sm:p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <div className="text-center mb-6">
-          <div className={`w-16 h-16 rounded-full border-2 ${getColorClasses(currentStepData.color)} flex items-center justify-center mx-auto mb-4`}>
-            <Icon className="w-8 h-8" />
+          <div className={`w-12 h-12 sm:w-16 sm:h-16 rounded-full border-2 ${getColorClasses(currentStepData.color)} flex items-center justify-center mx-auto mb-3 sm:mb-4`}>
+            <Icon className="w-6 h-6 sm:w-8 sm:h-8" />
           </div>
-          <h2 className="text-2xl font-bold text-white mb-2">{currentStepData.title}</h2>
-          <p className="text-gray-300">{currentStepData.description}</p>
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-2 px-2">{currentStepData.title}</h2>
+          <p className="text-gray-300 text-sm sm:text-base px-2">{currentStepData.description}</p>
         </div>
 
         {/* Progress Indicator */}
-        <div className="flex justify-center space-x-2 mb-6">
+        <div className="flex justify-center space-x-1 sm:space-x-2 mb-4 sm:mb-6">
           {tutorialSteps.map((_, index) => (
             <div
               key={index}
-              className={`w-2 h-2 rounded-full transition-colors ${
+              className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full transition-colors ${
                 index === currentStep ? 'bg-purple-500' : 
                 index < currentStep ? 'bg-green-500' : 'bg-gray-600'
               }`}
@@ -114,37 +114,45 @@ const Tutorial: React.FC<TutorialProps> = ({ onComplete }) => {
             onClick={handlePrevious}
             disabled={currentStep === 0}
             icon={ChevronLeft}
+            size="sm"
+            className="px-2 sm:px-4"
           >
-            Previous
+            <span className="hidden sm:inline">Previous</span>
+            <span className="sm:hidden">Prev</span>
           </Button>
 
-          <span className="text-gray-400 text-sm">
+          <span className="text-gray-400 text-xs sm:text-sm">
             {currentStep + 1} of {tutorialSteps.length}
           </span>
 
-          <div className="flex gap-2">
+          <div className="flex gap-1 sm:gap-2">
             {currentStepData.action && (
               <Button
                 variant="success"
                 onClick={handleVisitSection}
                 size="sm"
+                className="px-2 sm:px-3"
               >
-                Visit Now
+                <span className="hidden sm:inline">Visit Now</span>
+                <span className="sm:hidden">Visit</span>
               </Button>
             )}
             <Button
               onClick={handleNext}
               icon={currentStep === tutorialSteps.length - 1 ? Trophy : ChevronRight}
+              size="sm"
+              className="px-2 sm:px-4"
             >
-              {currentStep === tutorialSteps.length - 1 ? 'Get Started' : 'Next'}
+              <span className="hidden sm:inline">{currentStep === tutorialSteps.length - 1 ? 'Get Started' : 'Next'}</span>
+              <span className="sm:hidden">{currentStep === tutorialSteps.length - 1 ? 'Start' : 'Next'}</span>
             </Button>
           </div>
         </div>
 
-        <div className="mt-4 text-center">
+        <div className="mt-3 sm:mt-4 text-center">
           <button
             onClick={onComplete}
-            className="text-gray-400 hover:text-white text-sm underline"
+            className="text-gray-400 hover:text-white text-xs sm:text-sm underline touch-manipulation"
           >
             Skip Tutorial
           </button>
