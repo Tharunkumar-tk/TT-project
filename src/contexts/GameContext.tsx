@@ -82,7 +82,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       thumbnail: 'https://images.pexels.com/photos/1552242/pexels-photo-1552242.jpeg?auto=compress&cs=tinysrgb&w=400',
       duration: '15:30',
       instructor: 'Coach Arjun',
-      youtubeId: 'U0bhE67HuDY'
+      youtubeId: 'IODxDxX7oi4'
     },
     {
       id: 'endurance-running',
@@ -92,7 +92,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       thumbnail: 'https://images.pexels.com/photos/2294361/pexels-photo-2294361.jpeg?auto=compress&cs=tinysrgb&w=400',
       duration: '12:45',
       instructor: 'Coach Priya',
-      youtubeId: 'U3HlEF_E9fo'
+      youtubeId: 'kVnyY17VS9Y'
     },
     {
       id: 'speed-drills',
@@ -102,7 +102,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       thumbnail: 'https://images.pexels.com/photos/2803158/pexels-photo-2803158.jpeg?auto=compress&cs=tinysrgb&w=400',
       duration: '18:20',
       instructor: 'Coach Sanjay',
-      youtubeId: 'XMZQ4P3CQm0'
+      youtubeId: 'R2_Mn-qRKjA'
     },
     {
       id: 'flexibility-routine',
@@ -112,7 +112,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       thumbnail: 'https://images.pexels.com/photos/4056723/pexels-photo-4056723.jpeg?auto=compress&cs=tinysrgb&w=400',
       duration: '10:15',
       instructor: 'Coach Meena',
-      youtubeId: 'CO0Xc1w4Oyg'
+      youtubeId: 'g_tea8ZNk5A'
     },
     {
       id: 'recovery-prevention',
@@ -122,7 +122,37 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       thumbnail: 'https://images.pexels.com/photos/3822864/pexels-photo-3822864.jpeg?auto=compress&cs=tinysrgb&w=400',
       duration: '14:10',
       instructor: 'Coach Rahul',
-      youtubeId: '25Y9-1bQ07E'
+      youtubeId: 'tkH2-_jMCSk'
+    },
+    {
+      id: 'pushup-form',
+      title: 'Perfect Push-Up Form',
+      description: 'Master the proper push-up technique for maximum effectiveness',
+      category: 'strength',
+      thumbnail: 'https://images.pexels.com/photos/416809/pexels-photo-416809.jpeg?auto=compress&cs=tinysrgb&w=400',
+      duration: '8:45',
+      instructor: 'Coach Arjun',
+      youtubeId: 'IODxDxX7oi4'
+    },
+    {
+      id: 'jump-training',
+      title: 'Vertical Jump Training',
+      description: 'Improve your vertical jump with these proven techniques',
+      category: 'speed',
+      thumbnail: 'https://images.pexels.com/photos/1552252/pexels-photo-1552252.jpeg?auto=compress&cs=tinysrgb&w=400',
+      duration: '11:30',
+      instructor: 'Coach Sanjay',
+      youtubeId: 'R2_Mn-qRKjA'
+    },
+    {
+      id: 'core-strength',
+      title: 'Core Strengthening Exercises',
+      description: 'Build a strong core with these effective exercises',
+      category: 'strength',
+      thumbnail: 'https://images.pexels.com/photos/3768916/pexels-photo-3768916.jpeg?auto=compress&cs=tinysrgb&w=400',
+      duration: '13:20',
+      instructor: 'Coach Meena',
+      youtubeId: 'g_tea8ZNk5A'
     }
   ];
 

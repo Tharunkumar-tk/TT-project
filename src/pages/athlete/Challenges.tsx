@@ -105,7 +105,7 @@ const Challenges: React.FC = () => {
 
     // For other challenges, redirect to video upload with pre-selected activity
     const activityType = challenge.activityType || challenge.id.split('-')[1]; // fallback to extract from ID
-    navigate(`/athlete/upload?activity=${activityType}&challenge=${challenge.id}`);
+    navigate(`/athlete/upload?activity=${activityType}&challenge=${challenge.id}&challengeName=${encodeURIComponent(challenge.title)}`);
   };
 
   const getDifficultyColor = (difficulty: string) => {
