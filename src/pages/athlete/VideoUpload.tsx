@@ -336,7 +336,6 @@ export const VideoUpload: React.FC<VideoUploadProps> = () => {
                     </div>
                   </div>
                   </div>
-                </div>
 
                 {selectedFile && (
                   <div className="mt-6 p-4 md:p-6 bg-gradient-to-r from-gray-700 to-gray-800 rounded-xl border border-gray-600">
@@ -359,6 +358,29 @@ export const VideoUpload: React.FC<VideoUploadProps> = () => {
                     </div>
                   </div>
                 )}
+
+                {selectedFile && (
+                  <div className="mt-6 p-4 md:p-6 bg-gradient-to-r from-gray-700 to-gray-800 rounded-xl border border-gray-600">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                      <div className="flex items-center space-x-3">
+                        <Video className="w-5 h-5 text-purple-400 mr-2" />
+                        <div>
+                          <div className="text-sm font-medium text-white truncate max-w-48">{selectedFile.name}</div>
+                          <div className="text-xs text-gray-400">
+                            {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB
+                          </div>
+                        </div>
+                      </div>
+                      <div className="w-full sm:w-auto">
+                        <Button onClick={handleUpload} className="w-full sm:w-auto bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800">
+                          <Sparkles className="w-4 h-4 mr-2" />
+                          Analyze Video
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
               </div>
             )}
 
