@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Upload, Video, CheckCircle, AlertCircle } from 'lucide-react';
-import { Card } from '../../components/UI/Card';
+import Card from '../../components/UI/Card';
 import Button from '../../components/UI/Button';
 
 interface VideoUploadProps {}
