@@ -76,6 +76,15 @@ const activityDemos: Record<string, ActivityDemo> = {
   }
 };
 
+// Challenge name mapping
+const challengeNames: Record<string, string> = {
+  'daily-jump': 'Daily Leap Challenge',
+  'daily-pushups': 'Power Push-ups Challenge',
+  'weekly-run': 'Distance Destroyer Challenge',
+  'shuttle-sprint': 'Shuttle Sprint Challenge',
+  'core-crusher': 'Core Crusher Challenge'
+};
+
 interface VideoUploadProps {}
 
 export const VideoUpload: React.FC<VideoUploadProps> = () => {
@@ -91,6 +100,7 @@ export const VideoUpload: React.FC<VideoUploadProps> = () => {
   const activityType = searchParams.get('activity') || '';
   const challengeId = searchParams.get('challenge') || '';
   const currentDemo = activityDemos[activityType];
+  const challengeName = challengeId ? challengeNames[challengeId] : null;
 
   useEffect(() => {
     // Reset state when activity changes
@@ -241,10 +251,15 @@ export const VideoUpload: React.FC<VideoUploadProps> = () => {
           </Button>
           <div className="min-w-0 flex-1">
             <h1 className="text-lg sm:text-2xl md:text-3xl font-bold text-white truncate">
-              {currentDemo ? `${currentDemo.name} Upload` : 'Video Upload'}
+              {challengeName || (currentDemo ? `${currentDemo.name} Upload` : 'Video Upload')}
             </h1>
             <p className="text-gray-400 mt-1 text-xs sm:text-sm line-clamp-2">
-              {currentDemo ? `Upload your ${currentDemo.name.toLowerCase()} video for AI analysis` : 'Upload your training videos for analysis and feedback'}
+              {challengeName 
+                ? `Complete the ${challengeName} by uploading your video`
+                : currentDemo 
+                  ? `Upload your ${currentDemo.name.toLowerCase()} video for AI analysis` 
+                  : 'Upload your training videos for analysis and feedback'
+              }
             </p>
           </div>
         </div>
@@ -259,313 +274,46 @@ export const VideoUpload: React.FC<VideoUploadProps> = () => {
         )}
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
-        {/* Upload Section */}
-        <div className="lg:col-span-2">
-          <Card>
-            {uploadStatus === 'idle' && (
-              <div>
-                <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-4 sm:mb-6 flex items-center justify-center">
-                  <div className="bg-gradient-to-r from-purple-500 to-blue-500 p-2 sm:p-3 rounded-xl mr-2 sm:mr-3">
-                    <Camera className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
-                  </div>
-                  {currentDemo ? `${currentDemo.name} Analysis` : 'AI Performance Analysis'}
-                </h2>
-                
-                <div className="relative overflow-hidden border-2 border-dashed border-gray-600 rounded-xl sm:rounded-2xl p-4 sm:p-8 md:p-12 hover:border-purple-500 transition-all duration-300 text-center bg-gradient-to-br from-gray-800/50 to-gray-900/50">
-                  {/* Background Pattern */}
-                  <div className="absolute inset-0 opacity-5">
-                    <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-blue-500"></div>
-                  </div>
-                  
-                  <div className="relative z-10">
-                    <div className="bg-gradient-to-r from-purple-600 to-blue-600 w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6 shadow-2xl">
-                      <Video className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white" />
-                    </div>
-                    
-                    <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-2 sm:mb-3">
-                      {currentDemo ? `Upload ${currentDemo.name} Video` : 'Upload Training Video'}
-                    </h3>
-                    
-                    <p className="text-gray-300 mb-4 sm:mb-8 text-xs sm:text-sm md:text-base max-w-md mx-auto leading-relaxed px-2">
-                      {currentDemo 
-                        ? `Record yourself performing ${currentDemo.name.toLowerCase()} and get instant AI feedback on your form and performance` 
-                        : 'Get instant AI-powered analysis of your technique, form, and performance metrics'
-                      }
-                    </p>
-                    
-                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 items-center justify-center mb-4 sm:mb-6">
-                      <div className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm text-purple-300">
-                        <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
-                        <span>AI-Powered Analysis</span>
-                      </div>
-                      <div className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm text-green-300">
-                        <Zap className="w-3 h-3 sm:w-4 sm:h-4" />
-                        <span>Instant Feedback</span>
-                      </div>
-                      <div className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm text-yellow-300">
-                        <span>🏆</span>
-                        <span>Earn Rewards</span>
-                      </div>
-                    </div>
-                    
-                    <input
-                      type="file"
-                      accept="video/*"
-                      onChange={handleFileSelect}
-                      className="hidden"
-                      id="video-upload"
-                    />
-                    <label
-                      htmlFor="video-upload"
-                      className="inline-flex items-center px-4 sm:px-6 md:px-8 py-3 sm:py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white text-sm sm:text-base md:text-lg font-semibold rounded-lg sm:rounded-xl hover:from-purple-700 hover:to-blue-700 cursor-pointer transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 touch-manipulation"
-                    >
-                      <Upload className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 mr-2 sm:mr-3" />
-                      <span className="hidden sm:inline">Choose Video File</span>
-                      <span className="sm:hidden">Choose Video</span>
-                    </label>
-                    
-                    <div className="mt-4 sm:mt-6 grid grid-cols-3 gap-2 sm:gap-4 text-xs text-gray-400 max-w-lg mx-auto">
-                      <div className="flex items-center justify-center space-x-1">
-                        <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                        <span className="hidden sm:inline">MP4, MOV, AVI</span>
-                        <span className="sm:hidden">MP4</span>
-                      </div>
-                      <div className="flex items-center justify-center space-x-1">
-                        <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-                        <span>100MB</span>
-                      </div>
-                      <div className="flex items-center justify-center space-x-1">
-                        <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
-                        <span className="hidden sm:inline">HD Quality</span>
-                        <span className="sm:hidden">HD</span>
-                      </div>
-                    </div>
-                  </div>
-                  </div>
-
-                {selectedFile && (
-                  <div className="mt-4 sm:mt-6 p-3 sm:p-4 md:p-6 bg-gradient-to-r from-gray-700 to-gray-800 rounded-lg sm:rounded-xl border border-gray-600">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                      <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
-                        <Video className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400" />
-                        <div>
-                          <div className="text-sm font-medium text-white truncate max-w-32 sm:max-w-48">{selectedFile.name}</div>
-                          <div className="text-xs text-gray-400">
-                            {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB
-                          </div>
-                        </div>
-                      </div>
-                      <div className="w-full sm:w-auto">
-                        <Button onClick={handleUpload} className="w-full sm:w-auto bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800" size="sm">
-                          <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                          <span className="hidden sm:inline">Analyze Video</span>
-                          <span className="sm:hidden">Analyze</span>
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {selectedFile && (
-                  <div className="mt-6 p-4 md:p-6 bg-gradient-to-r from-gray-700 to-gray-800 rounded-xl border border-gray-600">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                      <div className="flex items-center space-x-3">
-                        <Video className="w-5 h-5 text-purple-400 mr-2" />
-                        <div>
-                          <div className="text-sm font-medium text-white truncate max-w-48">{selectedFile.name}</div>
-                          <div className="text-xs text-gray-400">
-                            {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB
-                          </div>
-                        </div>
-                      </div>
-                      <div className="w-full sm:w-auto">
-                        <Button onClick={handleUpload} className="w-full sm:w-auto bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800">
-                          <Sparkles className="w-4 h-4 mr-2" />
-                          Analyze Video
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {uploadStatus === 'uploading' && (
-              <div className="text-center py-8 sm:py-12">
-                <div className="relative">
-                  <div className="animate-spin w-12 h-12 sm:w-16 sm:h-16 border-4 border-purple-600 border-t-transparent rounded-full mx-auto mb-4 sm:mb-6"></div>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Upload className="w-4 h-4 sm:w-6 sm:h-6 text-purple-400" />
-                  </div>
-                </div>
-                <h3 className="text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3">Uploading Video...</h3>
-                <p className="text-gray-400 mb-4 sm:mb-6 text-sm px-4">Securely transferring your video to our AI servers</p>
-                <div className="max-w-xs mx-auto">
-                  <div className="w-full bg-gray-700 rounded-full h-3 overflow-hidden">
-                    <div className="bg-gradient-to-r from-purple-600 to-blue-600 h-3 rounded-full animate-pulse transition-all duration-1000" style={{ width: '75%' }}></div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {uploadStatus === 'analyzing' && (
-              <div className="text-center py-8 sm:py-12">
-                <div className="relative">
-                  <div className="animate-pulse w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-purple-600 to-green-600 rounded-full mx-auto mb-3 sm:mb-4 flex items-center justify-center">
-                    <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
-                  </div>
-                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 animate-ping w-12 h-12 sm:w-16 sm:h-16 bg-purple-600/30 rounded-full"></div>
-                </div>
-                <h3 className="text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3">AI Analysis in Progress...</h3>
-                <p className="text-gray-400 mb-4 sm:mb-6 text-sm px-4">Our advanced AI is analyzing your {currentDemo?.name.toLowerCase() || 'performance'}</p>
-                
-                <div className="bg-gray-700 rounded-lg sm:rounded-xl p-3 sm:p-4 max-w-md mx-auto mb-4 sm:mb-6">
-                  <div className="flex justify-center space-x-1 mb-3">
-                    <div className="w-3 h-3 bg-purple-600 rounded-full animate-bounce"></div>
-                    <div className="w-3 h-3 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                    <div className="w-3 h-3 bg-green-600 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                  </div>
-                  <p className="text-xs sm:text-sm text-gray-300">Detecting movement patterns and counting reps...</p>
-                </div>
-              </div>
-            )}
-
-            {uploadStatus === 'success' && analysisResults && (
-              <div className="space-y-4 sm:space-y-6">
-                <div className="text-center">
-                  <div className="relative">
-                    <div className="bg-gradient-to-r from-green-500 to-emerald-500 w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6 shadow-2xl">
-                      <CheckCircle className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
-                    </div>
-                    <div className="absolute inset-0 animate-ping w-16 h-16 sm:w-20 sm:h-20 bg-green-500/30 rounded-full mx-auto"></div>
-                  </div>
-                  <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-2 sm:mb-3">Analysis Complete! 🎉</h3>
-                  <p className="text-gray-300 text-sm sm:text-base px-4">Your {currentDemo?.name.toLowerCase() || 'video'} has been successfully analyzed</p>
-                </div>
-
-                {/* Analysis Results */}
-                <div className="bg-gradient-to-r from-gray-700 to-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-600">
-                  <h4 className="text-lg sm:text-xl font-bold text-white mb-4 sm:mb-6 flex items-center justify-center">
-                    <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-400 mr-2" />
-                    Performance Results
-                  </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6 mb-4 sm:mb-6">
-                    <div className="text-center bg-gray-800 rounded-lg sm:rounded-xl p-3 sm:p-4">
-                      <div className="text-xl sm:text-2xl md:text-3xl font-bold text-purple-400 mb-1 sm:mb-2">{analysisResults.measurement}</div>
-                      <div className="text-xs sm:text-sm text-gray-300 font-medium">
-                        {activityType === 'jump' ? 'Jump Height' :
-                         activityType === 'shuttle' ? 'Best Time' :
-                         activityType === 'pushup' || activityType === 'situp' ? 'Reps Counted' :
-                         activityType === 'endurance' ? 'Distance' : 'Result'}
-                      </div>
-                    </div>
-                    <div className="text-center bg-gray-800 rounded-lg sm:rounded-xl p-3 sm:p-4">
-                      <div className={`text-3xl font-bold mb-2 ${
-                        analysisResults.rating === 'Excellent' ? 'text-green-400' :
-                        analysisResults.rating === 'Good' ? 'text-yellow-400' : 'text-orange-400'
-                      }`}>
-                        {analysisResults.rating}
-                      </div>
-                      <div className="text-xs sm:text-sm text-gray-400">Form Rating</div>
-                    </div>
-                    <div className="text-center bg-gray-800 rounded-lg sm:rounded-xl p-3 sm:p-4">
-                      <div className="text-xl sm:text-2xl md:text-3xl font-bold text-blue-400 mb-1 sm:mb-2">
-                        {Math.floor((analysisResults.count / analysisResults.target) * 100)}%
-                      </div>
-                      <div className="text-xs sm:text-sm text-gray-400">Progress</div>
-                    </div>
-                  </div>
-
-                  <div className="bg-gray-800 rounded-lg p-3 sm:p-4 mb-3 sm:mb-4">
-                    <h5 className="text-white font-bold mb-2 sm:mb-3 flex items-center">
-                      <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400 mr-2" />
-                      AI Feedback
-                    </h5>
-                    <p className="text-gray-200 leading-relaxed text-sm sm:text-base">{analysisResults.feedback}</p>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row justify-center gap-2 sm:gap-4 text-center">
-                    <div className="bg-yellow-600/20 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-center space-x-1 sm:space-x-2">
-                      <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400" />
-                      <span className="text-yellow-400 font-bold">+{analysisResults.xpEarned} XP</span>
-                    </div>
-                    <div className="bg-green-600/20 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-center space-x-1 sm:space-x-2">
-                      <span className="text-2xl">🪙</span>
-                      <span className="text-green-400 font-bold">+{analysisResults.coinsEarned} Coins</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-                  <Button onClick={resetUpload} variant="secondary" className="flex-1">
-                    <span className="hidden sm:inline">Upload Another</span>
-                    <span className="sm:hidden">Upload Again</span>
-                  </Button>
-                  <Button onClick={() => navigate('/athlete/challenges')} className="flex-1">
-                    <span className="hidden sm:inline">Back to Challenges</span>
-                    <span className="sm:hidden">Challenges</span>
-                  </Button>
-                </div>
-              </div>
-            )}
-
-            {uploadStatus === 'error' && (
-              <div className="text-center py-8 sm:py-12">
-                <div className="bg-red-500 w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
-                  <AlertCircle className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
-                </div>
-                <h3 className="text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3">Upload Failed</h3>
-                <p className="text-gray-400 mb-4 sm:mb-6 max-w-md mx-auto text-sm px-4">
-                  There was an error processing your video. Please check your internet connection and try again.
-                </p>
-                <Button onClick={resetUpload} variant="secondary">
-                  <Upload className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
-                  Try Again
-                </Button>
-              </div>
-            )}
-          </Card>
-        </div>
-
-        {/* Demo Section */}
+      <div className="grid lg:grid-cols-2 gap-4 sm:gap-6">
+        {/* Demo Section - Now First */}
         {currentDemo && (
-          <div className="space-y-4 sm:space-y-6">
-            {/* Activity Demo */}
-            <Card>
-              <h3 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4 flex items-center">
-                <Play className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-2" />
-                {currentDemo.name} Demo
-              </h3>
-              
-              {/* GIF Display - Full View */}
-              <div className="mb-4 sm:mb-6 bg-gray-900 rounded-lg sm:rounded-xl overflow-hidden border border-gray-700">
-                <img 
-                  src={currentDemo.gif} 
-                  alt={`${currentDemo.name} demonstration`}
-                  className="w-full h-auto object-contain max-h-64 sm:max-h-none"
-                  style={{ maxHeight: 'none' }}
-                />
-              </div>
+          <Card>
+            <h3 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4 flex items-center">
+              <Play className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-2" />
+              {currentDemo.name} Demo
+            </h3>
+            
+            {/* GIF Display - Properly sized */}
+            <div className="mb-4 sm:mb-6 bg-gray-900 rounded-lg sm:rounded-xl overflow-hidden border border-gray-700">
+              <img 
+                src={currentDemo.gif} 
+                alt={`${currentDemo.name} demonstration`}
+                className="w-full h-auto object-contain"
+                style={{ maxHeight: '300px' }}
+                onError={(e) => {
+                  console.error('Failed to load GIF:', currentDemo.gif);
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+            </div>
 
-              {/* Instructions */}
-              <div>
-                <h4 className="text-white font-bold mb-3 sm:mb-4 text-sm sm:text-base">Proper Technique:</h4>
-                <ol className="space-y-1 sm:space-y-2">
-                  {currentDemo.instructions.map((instruction, index) => (
-                    <li key={index} className="flex items-start space-x-2 sm:space-x-3">
-                      <span className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 bg-purple-600 text-white rounded-full flex items-center justify-center text-xs sm:text-sm font-medium">
-                        {index + 1}
-                      </span>
-                      <span className="text-gray-200 text-sm sm:text-base">{instruction}</span>
-                    </li>
-                  ))}
-                </ol>
-              </div>
-            </Card>
+            {/* Instructions */}
+            <div>
+              <h4 className="text-white font-bold mb-3 sm:mb-4 text-sm sm:text-base">Proper Technique:</h4>
+              <ol className="space-y-1 sm:space-y-2">
+                {currentDemo.instructions.map((instruction, index) => (
+                  <li key={index} className="flex items-start space-x-2 sm:space-x-3">
+                    <span className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 bg-purple-600 text-white rounded-full flex items-center justify-center text-xs sm:text-sm font-medium">
+                      {index + 1}
+                    </span>
+                    <span className="text-gray-200 text-sm sm:text-base">{instruction}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
 
-            {/* Tips */}
-            <Card>
+            {/* Recording Tips */}
+            <div className="mt-4 sm:mt-6 pt-4 border-t border-gray-700">
               <h4 className="text-white font-bold mb-3 sm:mb-4 flex items-center text-sm sm:text-base">
                 <Camera className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400 mr-2" />
                 Recording Tips
@@ -588,55 +336,288 @@ export const VideoUpload: React.FC<VideoUploadProps> = () => {
                   <span>Record from the side view</span>
                 </li>
               </ul>
-            </Card>
-          </div>
+            </div>
+          </Card>
         )}
 
-        {/* General Upload Info */}
-        {!currentDemo && (
-          <div className="space-y-4 sm:space-y-6">
-            <Card>
-              <h3 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4">Upload Guidelines</h3>
-              <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm text-gray-300">
-                <div className="flex items-start space-x-1 sm:space-x-2">
+        {/* Upload Section - Now Smaller */}
+        <Card>
+          {uploadStatus === 'idle' && (
+            <div>
+              <h2 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4 flex items-center">
+                <div className="bg-gradient-to-r from-purple-500 to-blue-500 p-2 rounded-lg mr-2">
+                  <Camera className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                </div>
+                Upload Your Video
+              </h2>
+              
+              <div className="relative overflow-hidden border-2 border-dashed border-gray-600 rounded-lg p-4 sm:p-6 hover:border-purple-500 transition-all duration-300 text-center bg-gradient-to-br from-gray-800/50 to-gray-900/50">
+                <div className="relative z-10">
+                  <div className="bg-gradient-to-r from-purple-600 to-blue-600 w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 shadow-lg">
+                    <Video className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
+                  </div>
+                  
+                  <h3 className="text-base sm:text-lg font-bold text-white mb-2">
+                    {challengeName 
+                      ? `Upload for ${challengeName}`
+                      : currentDemo 
+                        ? `Upload ${currentDemo.name} Video` 
+                        : 'Upload Training Video'
+                    }
+                  </h3>
+                  
+                  <p className="text-gray-300 mb-4 text-xs sm:text-sm max-w-sm mx-auto leading-relaxed">
+                    {currentDemo 
+                      ? `Record yourself performing ${currentDemo.name.toLowerCase()} and get instant AI feedback` 
+                      : 'Get instant AI-powered analysis of your technique and performance'
+                    }
+                  </p>
+                  
+                  <div className="flex flex-wrap justify-center gap-2 mb-4 text-xs">
+                    <div className="flex items-center space-x-1 text-purple-300">
+                      <Sparkles className="w-3 h-3" />
+                      <span>AI Analysis</span>
+                    </div>
+                    <div className="flex items-center space-x-1 text-green-300">
+                      <Zap className="w-3 h-3" />
+                      <span>Instant Feedback</span>
+                    </div>
+                    <div className="flex items-center space-x-1 text-yellow-300">
+                      <span>🏆</span>
+                      <span>Earn Rewards</span>
+                    </div>
+                  </div>
+                  
+                  <input
+                    type="file"
+                    accept="video/*"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                    id="video-upload"
+                  />
+                  <label
+                    htmlFor="video-upload"
+                    className="inline-flex items-center px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white text-sm sm:text-base font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 cursor-pointer transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 touch-manipulation"
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    Choose Video File
+                  </label>
+                  
+                  <div className="mt-3 sm:mt-4 flex justify-center gap-4 text-xs text-gray-400">
+                    <div className="flex items-center space-x-1">
+                      <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                      <span>MP4, MOV</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                      <span>100MB max</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+                      <span>HD Quality</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {selectedFile && (
+                <div className="mt-4 p-3 sm:p-4 bg-gradient-to-r from-gray-700 to-gray-800 rounded-lg border border-gray-600">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
+                      <Video className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400" />
+                      <div className="min-w-0">
+                        <div className="text-sm font-medium text-white truncate">{selectedFile.name}</div>
+                        <div className="text-xs text-gray-400">
+                          {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB
+                        </div>
+                      </div>
+                    </div>
+                    <Button onClick={handleUpload} className="w-full sm:w-auto bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800" size="sm">
+                      <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                      <span className="hidden sm:inline">Analyze Video</span>
+                      <span className="sm:hidden">Analyze</span>
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {uploadStatus === 'uploading' && (
+            <div className="text-center py-6 sm:py-8">
+              <div className="relative">
+                <div className="animate-spin w-12 h-12 sm:w-16 sm:h-16 border-4 border-purple-600 border-t-transparent rounded-full mx-auto mb-4 sm:mb-6"></div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Upload className="w-4 h-4 sm:w-6 sm:h-6 text-purple-400" />
+                </div>
+              </div>
+              <h3 className="text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3">Uploading Video...</h3>
+              <p className="text-gray-400 mb-4 sm:mb-6 text-sm px-4">Securely transferring your video to our AI servers</p>
+              <div className="max-w-xs mx-auto">
+                <div className="w-full bg-gray-700 rounded-full h-3 overflow-hidden">
+                  <div className="bg-gradient-to-r from-purple-600 to-blue-600 h-3 rounded-full animate-pulse transition-all duration-1000" style={{ width: '75%' }}></div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {uploadStatus === 'analyzing' && (
+            <div className="text-center py-6 sm:py-8">
+              <div className="relative">
+                <div className="animate-pulse w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-purple-600 to-green-600 rounded-full mx-auto mb-3 sm:mb-4 flex items-center justify-center">
+                  <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
+                </div>
+                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 animate-ping w-12 h-12 sm:w-16 sm:h-16 bg-purple-600/30 rounded-full"></div>
+              </div>
+              <h3 className="text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3">AI Analysis in Progress...</h3>
+              <p className="text-gray-400 mb-4 sm:mb-6 text-sm px-4">Our advanced AI is analyzing your {currentDemo?.name.toLowerCase() || 'performance'}</p>
+              
+              <div className="bg-gray-700 rounded-lg p-3 sm:p-4 max-w-md mx-auto mb-4 sm:mb-6">
+                <div className="flex justify-center space-x-1 mb-3">
+                  <div className="w-3 h-3 bg-purple-600 rounded-full animate-bounce"></div>
+                  <div className="w-3 h-3 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                  <div className="w-3 h-3 bg-green-600 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                </div>
+                <p className="text-xs sm:text-sm text-gray-300">Detecting movement patterns and counting reps...</p>
+              </div>
+            </div>
+          )}
+
+          {uploadStatus === 'success' && analysisResults && (
+            <div className="space-y-4 sm:space-y-6">
+              <div className="text-center">
+                <div className="relative">
+                  <div className="bg-gradient-to-r from-green-500 to-emerald-500 w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6 shadow-2xl">
+                    <CheckCircle className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+                  </div>
+                  <div className="absolute inset-0 animate-ping w-16 h-16 sm:w-20 sm:h-20 bg-green-500/30 rounded-full mx-auto"></div>
+                </div>
+                <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-2 sm:mb-3">Analysis Complete! 🎉</h3>
+                <p className="text-gray-300 text-sm sm:text-base px-4">Your {currentDemo?.name.toLowerCase() || 'video'} has been successfully analyzed</p>
+              </div>
+
+              {/* Analysis Results */}
+              <div className="bg-gradient-to-r from-gray-700 to-gray-800 rounded-xl p-4 sm:p-6 border border-gray-600">
+                <h4 className="text-lg sm:text-xl font-bold text-white mb-4 sm:mb-6 flex items-center justify-center">
+                  <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-400 mr-2" />
+                  Performance Results
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6 mb-4 sm:mb-6">
+                  <div className="text-center bg-gray-800 rounded-lg p-3 sm:p-4">
+                    <div className="text-xl sm:text-2xl md:text-3xl font-bold text-purple-400 mb-1 sm:mb-2">{analysisResults.measurement}</div>
+                    <div className="text-xs sm:text-sm text-gray-300 font-medium">
+                      {activityType === 'jump' ? 'Jump Height' :
+                       activityType === 'shuttle' ? 'Best Time' :
+                       activityType === 'pushup' || activityType === 'situp' ? 'Reps Counted' :
+                       activityType === 'endurance' ? 'Distance' : 'Result'}
+                    </div>
+                  </div>
+                  <div className="text-center bg-gray-800 rounded-lg p-3 sm:p-4">
+                    <div className={`text-xl sm:text-2xl md:text-3xl font-bold mb-1 sm:mb-2 ${
+                      analysisResults.rating === 'Excellent' ? 'text-green-400' :
+                      analysisResults.rating === 'Good' ? 'text-yellow-400' : 'text-orange-400'
+                    }`}>
+                      {analysisResults.rating}
+                    </div>
+                    <div className="text-xs sm:text-sm text-gray-400">Form Rating</div>
+                  </div>
+                  <div className="text-center bg-gray-800 rounded-lg p-3 sm:p-4">
+                    <div className="text-xl sm:text-2xl md:text-3xl font-bold text-blue-400 mb-1 sm:mb-2">
+                      {Math.floor((analysisResults.count / analysisResults.target) * 100)}%
+                    </div>
+                    <div className="text-xs sm:text-sm text-gray-400">Progress</div>
+                  </div>
+                </div>
+
+                <div className="bg-gray-800 rounded-lg p-3 sm:p-4 mb-3 sm:mb-4">
+                  <h5 className="text-white font-bold mb-2 sm:mb-3 flex items-center">
+                    <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400 mr-2" />
+                    AI Feedback
+                  </h5>
+                  <p className="text-gray-200 leading-relaxed text-sm sm:text-base">{analysisResults.feedback}</p>
+                </div>
+
+                <div className="flex flex-col sm:flex-row justify-center gap-2 sm:gap-4 text-center">
+                  <div className="bg-yellow-600/20 rounded-lg px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-center space-x-1 sm:space-x-2">
+                    <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400" />
+                    <span className="text-yellow-400 font-bold">+{analysisResults.xpEarned} XP</span>
+                  </div>
+                  <div className="bg-green-600/20 rounded-lg px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-center space-x-1 sm:space-x-2">
+                    <span className="text-xl sm:text-2xl">🪙</span>
+                    <span className="text-green-400 font-bold">+{analysisResults.coinsEarned} Coins</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                <Button onClick={resetUpload} variant="secondary" className="flex-1">
+                  <span className="hidden sm:inline">Upload Another</span>
+                  <span className="sm:hidden">Upload Again</span>
+                </Button>
+                <Button onClick={() => navigate('/athlete/challenges')} className="flex-1">
+                  <span className="hidden sm:inline">Back to Challenges</span>
+                  <span className="sm:hidden">Challenges</span>
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {uploadStatus === 'error' && (
+            <div className="text-center py-6 sm:py-8">
+              <div className="bg-red-500 w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                <AlertCircle className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+              </div>
+              <h3 className="text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3">Upload Failed</h3>
+              <p className="text-gray-400 mb-4 sm:mb-6 max-w-md mx-auto text-sm px-4">
+                There was an error processing your video. Please check your internet connection and try again.
+              </p>
+              <Button onClick={resetUpload} variant="secondary">
+                <Upload className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+                Try Again
+              </Button>
+            </div>
+          )}
+
+          {/* General Upload Info for non-specific activities */}
+          {!currentDemo && uploadStatus === 'idle' && (
+            <div className="mt-6 pt-4 border-t border-gray-700">
+              <h4 className="text-white font-bold mb-3">Upload Guidelines</h4>
+              <div className="space-y-2 text-sm text-gray-300">
+                <div className="flex items-start space-x-2">
                   <span className="text-green-400">✓</span>
                   <span>Record in landscape mode</span>
                 </div>
-                <div className="flex items-start space-x-1 sm:space-x-2">
+                <div className="flex items-start space-x-2">
                   <span className="text-green-400">✓</span>
                   <span>Good lighting required</span>
                 </div>
-                <div className="flex items-start space-x-1 sm:space-x-2">
+                <div className="flex items-start space-x-2">
                   <span className="text-green-400">✓</span>
                   <span>Show your full body in the frame</span>
                 </div>
-                <div className="flex items-start space-x-1 sm:space-x-2">
+                <div className="flex items-start space-x-2">
                   <span className="text-green-400">✓</span>
                   <span>Keep camera steady</span>
                 </div>
-                <div className="flex items-start space-x-1 sm:space-x-2">
-                  <span className="text-green-400">✓</span>
-                  <span>Record from side angle</span>
+              </div>
+
+              <div className="mt-4">
+                <h4 className="text-white font-bold mb-3">Available Activities</h4>
+                <div className="grid grid-cols-1 gap-2">
+                  {Object.values(activityDemos).map(demo => (
+                    <button
+                      key={demo.id}
+                      onClick={() => navigate(`/athlete/upload?activity=${demo.id}`)}
+                      className="p-2 sm:p-3 bg-gray-700 hover:bg-gray-600 rounded-lg text-left transition-colors touch-manipulation"
+                    >
+                      <div className="text-white font-medium text-xs sm:text-sm">{demo.name}</div>
+                    </button>
+                  ))}
                 </div>
               </div>
-            </Card>
-
-            <Card>
-              <h4 className="text-white font-bold mb-3 sm:mb-4 text-sm sm:text-base">Available Activities</h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {Object.values(activityDemos).map(demo => (
-                  <button
-                    key={demo.id}
-                    onClick={() => navigate(`/athlete/upload?activity=${demo.id}`)}
-                    className="p-2 sm:p-3 bg-gray-700 hover:bg-gray-600 rounded-lg text-left transition-colors touch-manipulation"
-                  >
-                    <div className="text-white font-medium text-xs sm:text-sm">{demo.name}</div>
-                  </button>
-                ))}
-              </div>
-            </Card>
-          </div>
-        )}
+            </div>
+          )}
+        </Card>
       </div>
     </div>
   );
