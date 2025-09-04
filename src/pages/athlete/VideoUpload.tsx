@@ -276,77 +276,7 @@ export const VideoUpload: React.FC<VideoUploadProps> = () => {
       </div>
 
       <div className="grid lg:grid-cols-2 gap-4 sm:gap-6">
-        {/* Demo Section - Larger and First */}
-        {currentDemo && (
-          <Card className="lg:col-span-1">
-            <h3 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4 flex items-center">
-              <Play className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-2" />
-              {currentDemo.name} Demo
-            </h3>
-            
-            {/* GIF Display - Better sizing and error handling */}
-            <div className="mb-4 sm:mb-6 bg-gray-900 rounded-lg sm:rounded-xl overflow-hidden border border-gray-700 relative">
-              <img 
-                src={currentDemo.gif} 
-                alt={`${currentDemo.name} demonstration`}
-                className="w-full h-auto object-cover rounded-lg"
-                style={{ maxHeight: '400px', minHeight: '200px' }}
-                onError={(e) => {
-                  console.error('Failed to load GIF:', currentDemo.gif);
-                  const target = e.currentTarget as HTMLImageElement;
-                  target.src = 'https://images.pexels.com/photos/1552242/pexels-photo-1552242.jpeg?auto=compress&cs=tinysrgb&w=600';
-                  target.alt = 'Exercise demonstration placeholder';
-                }}
-              />
-              <div className="absolute bottom-2 right-2 bg-black/70 px-2 py-1 rounded text-white text-xs">
-                Demo Video
-              </div>
-            </div>
-
-            {/* Instructions */}
-            <div>
-              <h4 className="text-white font-bold mb-3 sm:mb-4 text-sm sm:text-base">Proper Technique:</h4>
-              <ol className="space-y-1 sm:space-y-2">
-                {currentDemo.instructions.map((instruction, index) => (
-                  <li key={index} className="flex items-start space-x-2 sm:space-x-3">
-                    <span className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 bg-purple-600 text-white rounded-full flex items-center justify-center text-xs sm:text-sm font-medium">
-                      {index + 1}
-                    </span>
-                    <span className="text-gray-200 text-sm sm:text-base">{instruction}</span>
-                  </li>
-                ))}
-              </ol>
-            </div>
-
-            {/* Recording Tips */}
-            <div className="mt-4 sm:mt-6 pt-4 border-t border-gray-700">
-              <h4 className="text-white font-bold mb-3 sm:mb-4 flex items-center text-sm sm:text-base">
-                <Camera className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400 mr-2" />
-                Recording Tips
-              </h4>
-              <ul className="space-y-1 sm:space-y-2 text-xs sm:text-sm text-gray-300">
-                <li className="flex items-start space-x-1 sm:space-x-2">
-                  <span className="text-green-400">•</span>
-                  <span>Record in good lighting</span>
-                </li>
-                <li className="flex items-start space-x-1 sm:space-x-2">
-                  <span className="text-green-400">•</span>
-                  <span>Show your full body in frame</span>
-                </li>
-                <li className="flex items-start space-x-1 sm:space-x-2">
-                  <span className="text-green-400">•</span>
-                  <span>Keep camera steady</span>
-                </li>
-                <li className="flex items-start space-x-1 sm:space-x-2">
-                  <span className="text-green-400">•</span>
-                  <span>Record from the side view</span>
-                </li>
-              </ul>
-            </div>
-          </Card>
-        )}
-
-        {/* Upload Section - Smaller and Compact */}
+        {/* Upload Section - Left Side */}
         <Card className="lg:col-span-1">
           {uploadStatus === 'idle' && (
             <div>
@@ -448,6 +378,36 @@ export const VideoUpload: React.FC<VideoUploadProps> = () => {
                   </div>
                 </div>
               )}
+
+              {/* Upload Guidelines */}
+              <div className="mt-4 pt-3 border-t border-gray-700">
+                <h4 className="text-white font-bold mb-3 flex items-center">
+                  <Camera className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400 mr-2" />
+                  Recording Guidelines
+                </h4>
+                <div className="space-y-2 text-xs sm:text-sm text-gray-300">
+                  <div className="flex items-start space-x-2">
+                    <span className="text-green-400">📱</span>
+                    <span>Record in landscape mode</span>
+                  </div>
+                  <div className="flex items-start space-x-2">
+                    <span className="text-green-400">💡</span>
+                    <span>Good lighting required</span>
+                  </div>
+                  <div className="flex items-start space-x-2">
+                    <span className="text-green-400">👤</span>
+                    <span>Show your full body in frame</span>
+                  </div>
+                  <div className="flex items-start space-x-2">
+                    <span className="text-green-400">📹</span>
+                    <span>Keep camera steady</span>
+                  </div>
+                  <div className="flex items-start space-x-2">
+                    <span className="text-green-400">👁️</span>
+                    <span>Record from the side view</span>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
@@ -585,47 +545,124 @@ export const VideoUpload: React.FC<VideoUploadProps> = () => {
               </Button>
             </div>
           )}
+        </Card>
 
-          {/* General Upload Info for non-specific activities */}
-          {!currentDemo && uploadStatus === 'idle' && (
-            <div className="mt-4 pt-3 border-t border-gray-700">
-              <h4 className="text-white font-bold mb-3">Upload Guidelines</h4>
-              <div className="space-y-2 text-sm text-gray-300">
-                <div className="flex items-start space-x-2">
-                  <span className="text-green-400">✓</span>
-                  <span>Record in landscape mode</span>
-                </div>
-                <div className="flex items-start space-x-2">
-                  <span className="text-green-400">✓</span>
-                  <span>Good lighting required</span>
-                </div>
-                <div className="flex items-start space-x-2">
-                  <span className="text-green-400">✓</span>
-                  <span>Show your full body in the frame</span>
-                </div>
-                <div className="flex items-start space-x-2">
-                  <span className="text-green-400">✓</span>
-                  <span>Keep camera steady</span>
-                </div>
+        {/* Demo and Activities Section - Right Side */}
+        {currentDemo && (
+          <Card className="lg:col-span-1">
+            <h3 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4 flex items-center">
+              <Play className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-2" />
+              {currentDemo.name} Demo
+            </h3>
+            
+            {/* GIF Display - Better sizing and error handling */}
+            <div className="mb-4 sm:mb-6 bg-gray-900 rounded-lg sm:rounded-xl overflow-hidden border border-gray-700 relative">
+              <img 
+                src={currentDemo.gif} 
+                alt={`${currentDemo.name} demonstration`}
+                className="w-full h-auto object-cover rounded-lg"
+                style={{ maxHeight: '400px', minHeight: '200px' }}
+                onError={(e) => {
+                  console.error('Failed to load GIF:', currentDemo.gif);
+                  const target = e.currentTarget as HTMLImageElement;
+                  target.src = 'https://images.pexels.com/photos/1552242/pexels-photo-1552242.jpeg?auto=compress&cs=tinysrgb&w=600';
+                  target.alt = 'Exercise demonstration placeholder';
+                }}
+              />
+              <div className="absolute bottom-2 right-2 bg-black/70 px-2 py-1 rounded text-white text-xs">
+                Demo Video
               </div>
+            </div>
 
-              <div className="mt-4">
-                <h4 className="text-white font-bold mb-3">Available Activities</h4>
-                <div className="grid grid-cols-2 gap-2">
-                  {Object.values(activityDemos).map(demo => (
-                    <button
-                      key={demo.id}
-                      onClick={() => navigate(`/athlete/upload?activity=${demo.id}`)}
-                      className="p-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-center transition-colors touch-manipulation"
-                    >
-                      <div className="text-white font-medium text-xs">{demo.name}</div>
-                    </button>
-                  ))}
+            {/* Instructions */}
+            <div>
+              <h4 className="text-white font-bold mb-3 sm:mb-4 text-sm sm:text-base">Proper Technique:</h4>
+              <ol className="space-y-1 sm:space-y-2">
+                {currentDemo.instructions.map((instruction, index) => (
+                  <li key={index} className="flex items-start space-x-2 sm:space-x-3">
+                    <span className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 bg-purple-600 text-white rounded-full flex items-center justify-center text-xs sm:text-sm font-medium">
+                      {index + 1}
+                    </span>
+                    <span className="text-gray-200 text-sm sm:text-base">{instruction}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </Card>
+        )}
+
+        {/* Available Activities Section - Right Side for non-demo cases */}
+        {!currentDemo && (
+          <Card className="lg:col-span-1">
+            <h3 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4 flex items-center">
+              <Target className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500 mr-2" />
+              Available Activities
+            </h3>
+            
+            <div className="space-y-3">
+              {Object.values(activityDemos).map(demo => (
+                <button
+                  key={demo.id}
+                  onClick={() => navigate(`/athlete/upload?activity=${demo.id}`)}
+                  className="w-full p-3 sm:p-4 bg-gray-700 hover:bg-gray-600 rounded-lg text-left transition-all duration-200 hover:scale-105 transform touch-manipulation group"
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg flex items-center justify-center group-hover:from-purple-500 group-hover:to-blue-500 transition-all">
+                      <span className="text-lg sm:text-xl">
+                        {demo.id === 'jump' ? '🦘' :
+                         demo.id === 'shuttle' ? '🏃‍♂️' :
+                         demo.id === 'pushup' ? '💪' :
+                         demo.id === 'situp' ? '🔥' :
+                         demo.id === 'endurance' ? '🏃‍♀️' : '🏋️'}
+                      </span>
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-white font-medium text-sm sm:text-base group-hover:text-purple-300 transition-colors">
+                        {demo.name}
+                      </div>
+                      <div className="text-gray-400 text-xs sm:text-sm">
+                        {demo.id === 'jump' ? 'Test your vertical leap' :
+                         demo.id === 'shuttle' ? 'Speed and agility test' :
+                         demo.id === 'pushup' ? 'Upper body strength' :
+                         demo.id === 'situp' ? 'Core strength test' :
+                         demo.id === 'endurance' ? 'Cardio fitness test' : 'General fitness'}
+                      </div>
+                    </div>
+                    <div className="text-purple-400 group-hover:text-purple-300 transition-colors">
+                      <span className="text-xs sm:text-sm">→</span>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            {/* Quick Tips */}
+            <div className="mt-4 sm:mt-6 pt-4 border-t border-gray-700">
+              <h4 className="text-white font-bold mb-3 flex items-center text-sm sm:text-base">
+                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400 mr-2" />
+                Pro Tips
+              </h4>
+              <div className="space-y-2 text-xs sm:text-sm text-gray-300">
+                <div className="flex items-start space-x-2">
+                  <span className="text-yellow-400">💡</span>
+                  <span>Better lighting = better analysis</span>
+                </div>
+                <div className="flex items-start space-x-2">
+                  <span className="text-blue-400">🎯</span>
+                  <span>Follow the demo for best results</span>
+                </div>
+                <div className="flex items-start space-x-2">
+                  <span className="text-green-400">⚡</span>
+                  <span>Earn more XP with perfect form</span>
+                </div>
+                <div className="flex items-start space-x-2">
+                  <span className="text-purple-400">🏆</span>
+                  <span>Complete challenges for badges</span>
                 </div>
               </div>
             </div>
-          )}
-        </Card>
+          </Card>
+        )}
       </div>
     </div>
   );
