@@ -190,9 +190,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const getDefaultAvatar = (name: string, gender?: string, userId?: string) => {
     if (gender === 'male') {
-      return 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150';
+      return '/src/assets/profile-icons/6997484.png';
     } else if (gender === 'female') {
-      return 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=150';
+      return '/src/assets/profile-icons/6833605.png';
     } else {
       // Generate avatar with first letter of name
       const firstLetter = name.charAt(0).toUpperCase();
