@@ -150,7 +150,7 @@ const Roadmap: React.FC = () => {
 
               <div className="text-center">
                 <div className={`text-2xl md:text-4xl mb-2 md:mb-3 ${isUnlocked ? 'animate-bounce' : hasProgress ? '' : 'grayscale opacity-50'}`}>
-                  {isUnlocked ? badge.icon : hasProgress ? badge.icon : '🔒'}
+                  {badge.icon}
                 </div>
                 
                 <h3 className={`text-sm md:text-base font-bold mb-1 md:mb-2 ${isUnlocked ? 'text-white' : hasProgress ? 'text-gray-300' : 'text-gray-500'}`}>

@@ -61,7 +61,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         email: email.toLowerCase(),
         name: email.split('@')[0], // Use email prefix as name
         role,
-        avatar: getRandomIndianAvatar(),
+        avatar: getDefaultAvatar(email.split('@')[0], undefined, Date.now().toString()),
         onboardingComplete: false,
         profileComplete: false,
         ...(role === 'athlete' && {
@@ -106,7 +106,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         email: email.toLowerCase(),
         name,
         role,
-        avatar: getRandomIndianAvatar(),
+        avatar: getDefaultAvatar(name, undefined, Date.now().toString()),
         onboardingComplete: false,
         profileComplete: false,
         ...(role === 'athlete' && {
@@ -150,6 +150,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const updateUser = (updates: Partial<UserProfile>) => {
     if (user) {
+      // Update avatar based on gender if gender is being updated and no custom avatar is set
+      if (updates.gender && (user.avatar === 'default' || user.avatar?.startsWith('data:image/svg+xml'))) {
+        updates.avatar = getDefaultAvatar(user.name, updates.gender, user.id);
+      }
+      
       const updatedUser = { ...user, ...updates };
       
       // Check if coins increased and show notification
@@ -179,14 +184,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const getRandomIndianAvatar = () => {
-    const avatars = [
-      'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150',
-      'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=150',
-      'https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=150',
-      'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=150',
-      'https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=150'
-    ];
-    return avatars[Math.floor(Math.random() * avatars.length)];
+    // Return a placeholder that will be replaced by getDefaultAvatar
+    return 'default';
+  };
+
+  const getDefaultAvatar = (name: string, gender?: string, userId?: string) => {
+    if (gender === 'male') {
+      return 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150';
+    } else if (gender === 'female') {
+      return 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=150';
+    } else {
+      // Generate avatar with first letter of name
+      const firstLetter = name.charAt(0).toUpperCase();
+      const colors = ['bg-purple-500', 'bg-blue-500', 'bg-green-500', 'bg-yellow-500', 'bg-red-500', 'bg-indigo-500'];
+      const colorIndex = userId ? parseInt(userId) % colors.length : Math.floor(Math.random() * colors.length);
+      return `data:image/svg+xml,${encodeURIComponent(`
+        <svg width="150" height="150" xmlns="http://www.w3.org/2000/svg">
+          <rect width="150" height="150" fill="${colors[colorIndex].replace('bg-', '#').replace('-500', '')}"/>
+          <text x="75" y="85" font-family="Arial, sans-serif" font-size="60" font-weight="bold" text-anchor="middle" fill="white">${firstLetter}</text>
+        </svg>
+      `)}`;
+    }
   };
 
   const value = {
