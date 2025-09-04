@@ -1,11 +1,12 @@
 import React, { useState, useRef } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useGame } from '../../contexts/GameContext';
+import { indianStates } from '../../data/indianStates';
 import OnboardingSurvey from '../../components/Onboarding/OnboardingSurvey';
 import Card from '../../components/UI/Card';
 import ProgressBar from '../../components/UI/ProgressBar';
 import Button from '../../components/UI/Button';
-import { Trophy, Zap, Calendar, Star, Target, Edit, Save, Upload, Camera, Eye, EyeOff } from 'lucide-react';
+import { Trophy, Zap, Calendar, Star, Target, Edit, Save, Upload, Camera, Eye, EyeOff, User, Phone, MapPin, Award as AwardIcon } from 'lucide-react';
 
 const AthleteProfile: React.FC = () => {
   const { user, updateUser } = useAuth();
@@ -18,8 +19,16 @@ const AthleteProfile: React.FC = () => {
   
   const [editForm, setEditForm] = useState({
     name: user?.name || '',
+    email: user?.email || '',
+    gender: user?.gender || '',
+    mobile: user?.mobile || '',
+    state: user?.state || '',
+    district: user?.district || '',
+    achievements: user?.achievements || '',
     height: user?.height || '',
-    weight: user?.weight || ''
+    weight: user?.weight || '',
+    bio: user?.bio || '',
+    expertise: user?.expertise || ''
   });
 
   if (!user) return null;
@@ -34,6 +43,9 @@ const AthleteProfile: React.FC = () => {
     );
   }
 
+  const selectedState = indianStates.find(state => state.name === editForm.state);
+  const districts = selectedState ? selectedState.districts : [];
+
   const level = user.level || 1;
   const xpForNextLevel = level * 300;
   const currentXP = (user.xp || 0) % 300;
@@ -43,10 +55,23 @@ const AthleteProfile: React.FC = () => {
   const displayedProgressBadges = showAllProgress ? progressBadges : progressBadges.slice(0, 5);
 
   const handleSaveProfile = () => {
-    updateUser({ 
-      name: editForm.name,
-      height: editForm.height,
-      weight: editForm.weight
+    updateUser(editForm);
+    setIsEditing(false);
+  };
+
+  const handleCancelEdit = () => {
+    setEditForm({
+      name: user?.name || '',
+      email: user?.email || '',
+      gender: user?.gender || '',
+      mobile: user?.mobile || '',
+      state: user?.state || '',
+      district: user?.district || '',
+      achievements: user?.achievements || '',
+      height: user?.height || '',
+      weight: user?.weight || '',
+      bio: user?.bio || '',
+      expertise: user?.expertise || ''
     });
     setIsEditing(false);
   };
@@ -79,15 +104,39 @@ const AthleteProfile: React.FC = () => {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <h1 className="text-2xl sm:text-3xl font-bold text-white">Profile</h1>
-        <Button 
-          variant={isEditing ? "success" : "secondary"}
-          icon={isEditing ? Save : Edit}
-          onClick={isEditing ? handleSaveProfile : () => setIsEditing(true)}
-          size="sm"
-          className="w-full sm:w-auto"
-        >
-          {isEditing ? 'Save Changes' : 'Edit Profile'}
-        </Button>
+        <div className="flex gap-2">
+          {isEditing ? (
+            <>
+              <Button 
+                variant="secondary"
+                onClick={handleCancelEdit}
+                size="sm"
+                className="w-full sm:w-auto"
+              >
+                Cancel
+              </Button>
+              <Button 
+                variant="success"
+                icon={Save}
+                onClick={handleSaveProfile}
+                size="sm"
+                className="w-full sm:w-auto"
+              >
+                Save Changes
+              </Button>
+            </>
+          ) : (
+            <Button 
+              variant="secondary"
+              icon={Edit}
+              onClick={() => setIsEditing(true)}
+              size="sm"
+              className="w-full sm:w-auto"
+            >
+              Edit Profile
+            </Button>
+          )}
+        </div>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
@@ -117,32 +166,38 @@ const AthleteProfile: React.FC = () => {
               />
             </div>
 
-            {isEditing ? (
-              <div className="space-y-2 sm:space-y-3 mb-4">
-                <input
-                  type="text"
-                  value={editForm.name}
-                  onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
-                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-center text-sm sm:text-base"
-                  placeholder="Full Name"
-                />
-              </div>
-            ) : (
-              <div className="mb-4">
-                <h2 className="text-xl sm:text-2xl font-bold text-white mb-1">{user.name}</h2>
-                <p className="text-gray-400 mb-2 text-sm sm:text-base truncate">{user.email}</p>
-                {user.gender && <p className="text-gray-400 text-sm">Gender: {user.gender}</p>}
-                {user.mobile && <p className="text-gray-400 text-sm">Mobile: {user.mobile}</p>}
-                {user.state && user.district && (
-                  <p className="text-purple-400 text-sm mt-1 truncate">📍 {user.district}, {user.state}</p>
-                )}
-                {user.achievements && (
-                  <p className="text-gray-300 text-xs sm:text-sm italic mt-2 bg-gray-700 p-2 rounded line-clamp-3">
-                    "{user.achievements}"
-                  </p>
-                )}
-              </div>
-            )}
+            {/* Basic Information */}
+            <div className="space-y-3 mb-4">
+              {isEditing ? (
+                <>
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1">Full Name</label>
+                    <input
+                      type="text"
+                      value={editForm.name}
+                      onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-center text-sm sm:text-base"
+                      placeholder="Enter your full name"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1">Email Address</label>
+                    <input
+                      type="email"
+                      value={editForm.email}
+                      onChange={(e) => setEditForm(prev => ({ ...prev, email: e.target.value }))}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-center text-sm sm:text-base"
+                      placeholder="Enter your email"
+                    />
+                  </div>
+                </>
+              ) : (
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-bold text-white mb-1">{user.name}</h2>
+                  <p className="text-gray-400 mb-2 text-sm sm:text-base truncate">{user.email}</p>
+                </div>
+              )}
+            </div>
             
             <div className="bg-purple-600/20 rounded-lg p-3 sm:p-4 mb-4">
               <div className="flex items-center justify-center space-x-2 mb-2">
@@ -177,31 +232,148 @@ const AthleteProfile: React.FC = () => {
                 <div className="text-xs text-gray-400">Streak</div>
               </div>
             </div>
+          </div>
+        </Card>
 
-            {/* Physical Stats */}
-            <div className="space-y-3 sm:space-y-4">
-              <h3 className="text-base sm:text-lg font-bold text-white">Physical Stats</h3>
-              
-              {/* Height */}
-              <div className="bg-gray-700 rounded-lg p-2 sm:p-3">
-                <label className="block text-sm text-gray-400 mb-2">Height (cm)</label>
-                {isEditing ? (
-                  <div className="space-y-1 sm:space-y-2">
+        {/* Detailed Information */}
+        <div className="lg:col-span-2 space-y-4 sm:space-y-6">
+          {/* Personal Information */}
+          <Card>
+            <h3 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4 flex items-center">
+              <User className="w-5 h-5 sm:w-6 sm:h-6 text-blue-500 mr-2" />
+              Personal Information
+            </h3>
+            
+            {isEditing ? (
+              <div className="grid md:grid-cols-2 gap-3 sm:gap-4">
+                <div>
+                  <label className="block text-xs sm:text-sm text-gray-400 mb-2">Gender</label>
+                  <select
+                    value={editForm.gender}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, gender: e.target.value }))}
+                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm sm:text-base"
+                  >
+                    <option value="">Select Gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs sm:text-sm text-gray-400 mb-2">Mobile Number</label>
+                  <input
+                    type="tel"
+                    value={editForm.mobile}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, mobile: e.target.value }))}
+                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm sm:text-base"
+                    placeholder="Enter mobile number"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs sm:text-sm text-gray-400 mb-2">State</label>
+                  <select
+                    value={editForm.state}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, state: e.target.value, district: '' }))}
+                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm sm:text-base"
+                  >
+                    <option value="">Select State</option>
+                    {indianStates.map(state => (
+                      <option key={state.name} value={state.name}>{state.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs sm:text-sm text-gray-400 mb-2">District</label>
+                  <select
+                    value={editForm.district}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, district: e.target.value }))}
+                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm sm:text-base"
+                    disabled={!editForm.state}
+                  >
+                    <option value="">Select District</option>
+                    {districts.map(district => (
+                      <option key={district} value={district}>{district}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-xs sm:text-sm text-gray-400 mb-2">Achievements & Goals</label>
+                  <textarea
+                    value={editForm.achievements}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, achievements: e.target.value }))}
+                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm sm:text-base resize-none"
+                    placeholder="Share your athletic achievements, goals, or experience..."
+                    rows={3}
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="grid md:grid-cols-2 gap-3 sm:gap-4">
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <User className="w-4 h-4 text-gray-400" />
+                    <span className="text-gray-400 text-sm">Gender:</span>
+                    <span className="text-white text-sm">{user.gender || 'Not specified'}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Phone className="w-4 h-4 text-gray-400" />
+                    <span className="text-gray-400 text-sm">Mobile:</span>
+                    <span className="text-white text-sm">{user.mobile || 'Not provided'}</span>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <MapPin className="w-4 h-4 text-gray-400" />
+                    <span className="text-gray-400 text-sm">Location:</span>
+                    <span className="text-white text-sm">
+                      {user.state && user.district ? `${user.district}, ${user.state}` : 'Not specified'}
+                    </span>
+                  </div>
+                </div>
+                {user.achievements && (
+                  <div className="md:col-span-2 mt-3">
+                    <div className="flex items-start space-x-2">
+                      <AwardIcon className="w-4 h-4 text-gray-400 mt-0.5" />
+                      <div>
+                        <span className="text-gray-400 text-sm">Achievements:</span>
+                        <p className="text-gray-300 text-sm italic mt-1 bg-gray-700 p-2 rounded line-clamp-3">
+                          "{user.achievements}"
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </Card>
+
+          {/* Physical Stats */}
+          <Card>
+            <h3 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4 flex items-center">
+              <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-green-500 mr-2" />
+              Physical Stats
+            </h3>
+            
+            {isEditing ? (
+              <div className="grid md:grid-cols-2 gap-3 sm:gap-4">
+                <div>
+                  <label className="block text-xs sm:text-sm text-gray-400 mb-2">Height (cm)</label>
+                  <div className="space-y-2">
                     <input
                       type="number"
                       value={editForm.height}
                       onChange={(e) => setEditForm(prev => ({ ...prev, height: e.target.value }))}
-                      className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded text-white text-sm sm:text-base"
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm sm:text-base"
                       placeholder="175"
                     />
-                    <div className="flex gap-1 sm:gap-2">
+                    <div className="flex gap-2">
                       <button
                         onClick={() => heightProofRef.current?.click()}
-                        className="flex-1 bg-purple-600 hover:bg-purple-700 px-2 sm:px-3 py-1.5 sm:py-2 rounded text-white text-xs sm:text-sm flex items-center justify-center touch-manipulation"
+                        className="flex-1 bg-purple-600 hover:bg-purple-700 px-3 py-2 rounded text-white text-xs sm:text-sm flex items-center justify-center touch-manipulation"
                       >
                         <Upload className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
-                        <span className="hidden sm:inline">Upload Proof</span>
-                        <span className="sm:hidden">Proof</span>
+                        <span className="hidden sm:inline">Upload Height Proof</span>
+                        <span className="sm:hidden">Upload Proof</span>
                       </button>
                     </div>
                     <input
@@ -212,43 +384,105 @@ const AthleteProfile: React.FC = () => {
                       className="hidden"
                     />
                     {user.heightProof && (
-                      <p className="text-green-400 text-xs">✓ Proof image uploaded</p>
+                      <p className="text-green-400 text-xs">✓ Height proof uploaded</p>
                     )}
-                    <p className="text-gray-500 text-xs line-clamp-2">
-                      Upload full-body photo for verification
+                    <p className="text-gray-500 text-xs">
+                      Upload full-body photo for height verification
                     </p>
                   </div>
-                ) : (
-                  <div className="text-white font-medium text-sm sm:text-base">
-                    {user.height ? `${user.height} cm` : 'Not set'}
-                    {user.heightProof && <span className="text-green-400 ml-2">✓</span>}
-                  </div>
-                )}
-              </div>
-
-              {/* Weight */}
-              <div className="bg-gray-700 rounded-lg p-2 sm:p-3">
-                <label className="block text-sm text-gray-400 mb-2">Weight (kg)</label>
-                {isEditing ? (
+                </div>
+                <div>
+                  <label className="block text-xs sm:text-sm text-gray-400 mb-2">Weight (kg)</label>
                   <input
                     type="number"
                     value={editForm.weight}
                     onChange={(e) => setEditForm(prev => ({ ...prev, weight: e.target.value }))}
-                    className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded text-white text-sm sm:text-base"
+                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm sm:text-base"
                     placeholder="70"
                   />
-                ) : (
+                </div>
+              </div>
+            ) : (
+              <div className="grid md:grid-cols-2 gap-3 sm:gap-4">
+                <div className="bg-gray-700 rounded-lg p-3">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-gray-400 text-sm">Height</span>
+                    {user.heightProof && <span className="text-green-400 text-xs">✓ Verified</span>}
+                  </div>
+                  <div className="text-white font-medium text-sm sm:text-base">
+                    {user.height ? `${user.height} cm` : 'Not set'}
+                  </div>
+                </div>
+                <div className="bg-gray-700 rounded-lg p-3">
+                  <span className="text-gray-400 text-sm block mb-1">Weight</span>
                   <div className="text-white font-medium text-sm sm:text-base">
                     {user.weight ? `${user.weight} kg` : 'Not set'}
                   </div>
+                </div>
+              </div>
+            )}
+          </Card>
+
+          {/* Additional Information */}
+          {isEditing && (
+            <Card>
+              <h3 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4 flex items-center">
+                <Edit className="w-5 h-5 sm:w-6 sm:h-6 text-orange-500 mr-2" />
+                Additional Information
+              </h3>
+              
+              <div className="space-y-3 sm:space-y-4">
+                <div>
+                  <label className="block text-xs sm:text-sm text-gray-400 mb-2">Bio / About Me</label>
+                  <textarea
+                    value={editForm.bio}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, bio: e.target.value }))}
+                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm sm:text-base resize-none"
+                    placeholder="Tell others about yourself, your athletic journey, and goals..."
+                    rows={3}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs sm:text-sm text-gray-400 mb-2">Sport Expertise / Focus</label>
+                  <input
+                    type="text"
+                    value={editForm.expertise}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, expertise: e.target.value }))}
+                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm sm:text-base"
+                    placeholder="e.g., Football, Cricket, Athletics, Swimming..."
+                  />
+                </div>
+              </div>
+            </Card>
+          )}
+
+          {/* Display Additional Info when not editing */}
+          {!isEditing && (user.bio || user.expertise) && (
+            <Card>
+              <h3 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4 flex items-center">
+                <Star className="w-5 h-5 sm:w-6 sm:h-6 text-orange-500 mr-2" />
+                About Me
+              </h3>
+              
+              <div className="space-y-3">
+                {user.expertise && (
+                  <div>
+                    <span className="text-gray-400 text-sm block mb-1">Sport Focus:</span>
+                    <span className="text-blue-400 font-medium text-sm">{user.expertise}</span>
+                  </div>
+                )}
+                {user.bio && (
+                  <div>
+                    <span className="text-gray-400 text-sm block mb-1">Bio:</span>
+                    <p className="text-gray-300 text-sm bg-gray-700 p-3 rounded-lg">
+                      {user.bio}
+                    </p>
+                  </div>
                 )}
               </div>
-            </div>
-          </div>
-        </Card>
+            </Card>
+          )}
 
-        {/* Stats and Achievements */}
-        <div className="lg:col-span-2 space-y-4 sm:space-y-6">
           {/* Achievement Summary */}
           <Card>
             <h3 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4 flex items-center">
