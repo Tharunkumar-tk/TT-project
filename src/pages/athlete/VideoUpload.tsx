@@ -558,7 +558,7 @@ export const VideoUpload: React.FC<VideoUploadProps> = () => {
             {/* GIF Display - Better sizing and error handling */}
             <div className="mb-4 sm:mb-6 bg-gray-900 rounded-lg sm:rounded-xl overflow-hidden border border-gray-700 relative">
               <img 
-                src={currentDemo.gif} 
+                src={encodeURI(currentDemo.gif)} 
                 alt={`${currentDemo.name} demonstration`}
                 className="w-full h-auto object-cover rounded-lg"
                 style={{ maxHeight: '400px', minHeight: '200px' }}
