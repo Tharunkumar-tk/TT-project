@@ -190,9 +190,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const getDefaultAvatar = (name: string, gender?: string, userId?: string) => {
     if (gender === 'male') {
-      return '/src/assets/profile-icons/6997484.png';
+      return '/src/assets/6997484.png';
     } else if (gender === 'female') {
-      return '/src/assets/profile-icons/6833605.png';
+      return '/src/assets/6833605.png';
     } else {
       // Generate avatar with first letter of name
       const firstLetter = name.charAt(0).toUpperCase();
@@ -200,7 +200,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const colorIndex = userId ? parseInt(userId) % colors.length : Math.floor(Math.random() * colors.length);
       return `data:image/svg+xml,${encodeURIComponent(`
         <svg width="150" height="150" xmlns="http://www.w3.org/2000/svg">
-          <rect width="150" height="150" fill="${colors[colorIndex].replace('bg-', '#').replace('-500', '')}"/>
+          <rect width="150" height="150" fill="${colors[colorIndex] === 'bg-purple-500' ? '#8b5cf6' : colors[colorIndex] === 'bg-blue-500' ? '#3b82f6' : colors[colorIndex] === 'bg-green-500' ? '#10b981' : colors[colorIndex] === 'bg-yellow-500' ? '#f59e0b' : colors[colorIndex] === 'bg-red-500' ? '#ef4444' : '#6366f1'}"/>
           <text x="75" y="85" font-family="Arial, sans-serif" font-size="60" font-weight="bold" text-anchor="middle" fill="white">${firstLetter}</text>
         </svg>
       `)}`;

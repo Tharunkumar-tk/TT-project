@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { saveBadges, loadBadges, saveChallenges, loadChallenges, Badge, Challenge } from '../utils/storage';
+import { useAuth } from './AuthContext';
 
 interface TrainingVideo {
   id: string;
@@ -17,11 +18,12 @@ interface GameContextType {
   challenges: Challenge[];
   trainingVideos: TrainingVideo[];
   unlockBadge: (badgeId: string) => void;
-  updateProgress: (challengeId: string, progress: number) => void;
-  completeChallenge: (challengeId: string) => void;
+  updateProgress: (challengeId: string, progress: number) => { xpEarned: number; coinsEarned: number; badgesUnlocked: Badge[] };
+  completeChallenge: (challengeId: string) => { xpEarned: number; coinsEarned: number; badgesUnlocked: Badge[] };
   earnXP: (amount: number) => void;
   earnCoins: (amount: number) => void;
   updateBadgeProgress: (badgeId: string, progress: number) => void;
+  checkBadgeUnlocks: (activityType: string, count: number) => Badge[];
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -41,6 +43,7 @@ interface GameProviderProps {
 export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   const [badges, setBadges] = useState<Badge[]>([]);
   const [challenges, setChallenges] = useState<Challenge[]>([]);
+  const { user, updateUser } = useAuth();
 
   // Initialize data on mount
   useEffect(() => {
@@ -163,11 +166,44 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   };
 
   const updateProgress = (challengeId: string, progress: number) => {
-    setChallenges(prev => prev.map(challenge =>
-      challenge.id === challengeId 
-        ? { ...challenge, progress: Math.min(progress, challenge.maxProgress) }
-        : challenge
-    ));
+    let xpEarned = 0;
+    let coinsEarned = 0;
+    let badgesUnlocked: Badge[] = [];
+    
+    setChallenges(prev => prev.map(challenge => {
+      if (challenge.id === challengeId) {
+        const newProgress = Math.min(progress, challenge.maxProgress);
+        const wasCompleted = challenge.completed;
+        const isNowCompleted = newProgress >= challenge.maxProgress;
+        
+        // Award XP and coins if challenge is newly completed
+        if (!wasCompleted && isNowCompleted) {
+          xpEarned = challenge.xpReward;
+          coinsEarned = challenge.coinReward;
+          
+          // Check for badge unlocks based on activity type and progress
+          badgesUnlocked = checkBadgeUnlocks(challenge.activityType, newProgress);
+          
+          // Update user stats
+          if (user) {
+            updateUser({
+              xp: (user.xp || 0) + xpEarned,
+              coins: (user.coins || 0) + coinsEarned,
+              streak: Math.max((user.streak || 0), (user.streak || 0) + 1)
+            });
+          }
+        }
+        
+        return { 
+          ...challenge, 
+          progress: newProgress,
+          completed: isNowCompleted
+        };
+      }
+      return challenge;
+    }));
+    
+    return { xpEarned, coinsEarned, badgesUnlocked };
   };
 
   const updateBadgeProgress = (badgeId: string, progress: number) => {
@@ -179,11 +215,117 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   };
 
   const completeChallenge = (challengeId: string) => {
-    setChallenges(prev => prev.map(challenge =>
-      challenge.id === challengeId 
-        ? { ...challenge, completed: true, progress: challenge.maxProgress }
-        : challenge
-    ));
+    let xpEarned = 0;
+    let coinsEarned = 0;
+    let badgesUnlocked: Badge[] = [];
+    
+    setChallenges(prev => prev.map(challenge => {
+      if (challenge.id === challengeId && !challenge.completed) {
+        xpEarned = challenge.xpReward;
+        coinsEarned = challenge.coinReward;
+        
+        // Check for badge unlocks
+        badgesUnlocked = checkBadgeUnlocks(challenge.activityType, challenge.maxProgress);
+        
+        // Update user stats
+        if (user) {
+          updateUser({
+            xp: (user.xp || 0) + xpEarned,
+            coins: (user.coins || 0) + coinsEarned,
+            streak: Math.max((user.streak || 0), (user.streak || 0) + 1)
+          });
+        }
+        
+        return { ...challenge, completed: true, progress: challenge.maxProgress };
+      }
+      return challenge;
+    }));
+    
+    return { xpEarned, coinsEarned, badgesUnlocked };
+  };
+
+  const checkBadgeUnlocks = (activityType: string, count: number): Badge[] => {
+    const unlockedBadges: Badge[] = [];
+    
+    setBadges(prev => prev.map(badge => {
+      if (!badge.unlocked) {
+        let shouldUnlock = false;
+        
+        // Check specific badge unlock conditions
+        switch (badge.id) {
+          case 'day-one-champ':
+            shouldUnlock = true; // First challenge completion
+            break;
+          case 'rookie-runner':
+            shouldUnlock = activityType === 'pushup' || activityType === 'situp';
+            break;
+          case 'pushup-pro':
+            shouldUnlock = activityType === 'pushup' && count >= 50;
+            break;
+          case 'iron-core':
+            shouldUnlock = activityType === 'situp' && count >= 100;
+            break;
+          case 'stamina-starter':
+            shouldUnlock = activityType === 'endurance';
+            break;
+          case 'sprint-rookie':
+            shouldUnlock = activityType === 'shuttle';
+            break;
+          case 'video-verified':
+            shouldUnlock = true; // Any video upload
+            break;
+          // Add more badge unlock conditions as needed
+        }
+        
+        if (shouldUnlock) {
+          unlockedBadges.push({ ...badge, unlocked: true, progress: badge.maxProgress });
+          
+          // Award badge XP and coins to user
+          if (user) {
+            updateUser({
+              xp: (user.xp || 0) + badge.xpReward,
+              coins: (user.coins || 0) + badge.coinReward
+            });
+          }
+          
+          return { ...badge, unlocked: true, progress: badge.maxProgress };
+        }
+        
+        // Update progress for badges that track cumulative progress
+        if (badge.id === 'iron-arms' && activityType === 'pushup') {
+          const newProgress = Math.min(badge.progress + count, badge.maxProgress);
+          if (newProgress >= badge.maxProgress && !badge.unlocked) {
+            unlockedBadges.push({ ...badge, unlocked: true, progress: badge.maxProgress });
+            if (user) {
+              updateUser({
+                xp: (user.xp || 0) + badge.xpReward,
+                coins: (user.coins || 0) + badge.coinReward
+              });
+            }
+            return { ...badge, unlocked: true, progress: badge.maxProgress };
+          }
+          return { ...badge, progress: newProgress };
+        }
+        
+        if (badge.id === 'abs-of-steel' && activityType === 'situp') {
+          const newProgress = Math.min(badge.progress + count, badge.maxProgress);
+          if (newProgress >= badge.maxProgress && !badge.unlocked) {
+            unlockedBadges.push({ ...badge, unlocked: true, progress: badge.maxProgress });
+            if (user) {
+              updateUser({
+                xp: (user.xp || 0) + badge.xpReward,
+                coins: (user.coins || 0) + badge.coinReward
+              });
+            }
+            return { ...badge, unlocked: true, progress: badge.maxProgress };
+          }
+          return { ...badge, progress: newProgress };
+        }
+      }
+      return badge;
+    }));
+    
+    return unlockedBadges;
   };
 
   const earnXP = (amount: number) => {
@@ -203,7 +345,8 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     completeChallenge,
     earnXP,
     earnCoins,
-    updateBadgeProgress
+    updateBadgeProgress,
+    checkBadgeUnlocks
   };
 
   return (

@@ -138,22 +138,26 @@ export const VideoUpload: React.FC<VideoUploadProps> = () => {
       
       // Update user stats and challenge progress
       if (user) {
-        const xpGained = mockResults.xpEarned;
-        const coinsGained = mockResults.coinsEarned;
-        
-        updateUser({
-          xp: (user.xp || 0) + xpGained,
-          coins: (user.coins || 0) + coinsGained,
-          streak: (user.streak || 0) + (Math.random() > 0.5 ? 1 : 0)
-        });
-
         // Update challenge progress if coming from a challenge
         if (challengeId) {
-          updateProgress(challengeId, mockResults.count);
-          if (mockResults.count >= mockResults.target) {
-            completeChallenge(challengeId);
-          }
+          const result = updateProgress(challengeId, mockResults.count);
+          
+          // Add challenge rewards to mock results
+          mockResults.xpEarned += result.xpEarned;
+          mockResults.coinsEarned += result.coinsEarned;
+          mockResults.badgesUnlocked = result.badgesUnlocked;
+        } else {
+          // For non-challenge uploads, still check for badge unlocks
+          const badgesUnlocked = checkBadgeUnlocks(activityType, mockResults.count);
+          mockResults.badgesUnlocked = badgesUnlocked;
         }
+        
+        // Update user with video upload rewards
+        updateUser({
+          xp: (user.xp || 0) + mockResults.xpEarned,
+          coins: (user.coins || 0) + mockResults.coinsEarned,
+          streak: (user.streak || 0) + (Math.random() > 0.5 ? 1 : 0)
+        });
       }
       
       setUploadStatus('success');
@@ -173,7 +177,8 @@ export const VideoUpload: React.FC<VideoUploadProps> = () => {
           rating: jumpHeight > 45 ? 'Excellent' : jumpHeight > 40 ? 'Good' : 'Fair',
           feedback: jumpHeight > 45 ? 'Outstanding jump height!' : 'Good form, try to jump higher next time.',
           xpEarned: jumpHeight > 45 ? 75 : 50,
-          coinsEarned: jumpHeight > 45 ? 15 : 10
+          coinsEarned: jumpHeight > 45 ? 15 : 10,
+          badgesUnlocked: []
         };
       case 'shuttle':
         const time = (Math.random() * 3 + 10).toFixed(1); // 10-13 seconds
@@ -184,7 +189,8 @@ export const VideoUpload: React.FC<VideoUploadProps> = () => {
           rating: parseFloat(time) < 11.5 ? 'Excellent' : parseFloat(time) < 12.5 ? 'Good' : 'Fair',
           feedback: parseFloat(time) < 11.5 ? 'Amazing speed!' : 'Good run, work on acceleration.',
           xpEarned: parseFloat(time) < 11.5 ? 60 : 40,
-          coinsEarned: parseFloat(time) < 11.5 ? 12 : 8
+          coinsEarned: parseFloat(time) < 11.5 ? 12 : 8,
+          badgesUnlocked: []
         };
       case 'pushup':
         const pushups = Math.floor(Math.random() * 15) + 15; // 15-30
@@ -195,7 +201,8 @@ export const VideoUpload: React.FC<VideoUploadProps> = () => {
           rating: pushups >= 25 ? 'Excellent' : pushups >= 20 ? 'Good' : 'Fair',
           feedback: pushups >= 25 ? 'Perfect form and count!' : 'Good effort, keep building strength.',
           xpEarned: pushups >= 25 ? 60 : 40,
-          coinsEarned: pushups >= 25 ? 12 : 8
+          coinsEarned: pushups >= 25 ? 12 : 8,
+          badgesUnlocked: []
         };
       case 'situp':
         const situps = Math.floor(Math.random() * 20) + 30; // 30-50
@@ -206,7 +213,8 @@ export const VideoUpload: React.FC<VideoUploadProps> = () => {
           rating: situps >= 45 ? 'Excellent' : situps >= 35 ? 'Good' : 'Fair',
           feedback: situps >= 45 ? 'Excellent core strength!' : 'Good work, keep building endurance.',
           xpEarned: situps >= 45 ? 70 : 50,
-          coinsEarned: situps >= 45 ? 14 : 10
+          coinsEarned: situps >= 45 ? 14 : 10,
+          badgesUnlocked: []
         };
       case 'endurance':
         const distance = (Math.random() * 2 + 1).toFixed(1); // 1-3km
@@ -217,7 +225,8 @@ export const VideoUpload: React.FC<VideoUploadProps> = () => {
           rating: parseFloat(distance) > 2 ? 'Excellent' : parseFloat(distance) > 1.5 ? 'Good' : 'Fair',
           feedback: parseFloat(distance) > 2 ? 'Great endurance!' : 'Good pace, keep building stamina.',
           xpEarned: parseFloat(distance) > 2 ? 80 : 60,
-          coinsEarned: parseFloat(distance) > 2 ? 16 : 12
+          coinsEarned: parseFloat(distance) > 2 ? 16 : 12,
+          badgesUnlocked: []
         };
       default:
         return {
@@ -227,7 +236,8 @@ export const VideoUpload: React.FC<VideoUploadProps> = () => {
           rating: 'Good',
           feedback: 'Great job completing this activity!',
           xpEarned: 50,
-          coinsEarned: 10
+          coinsEarned: 10,
+          badgesUnlocked: []
         };
     }
   };
@@ -504,6 +514,24 @@ export const VideoUpload: React.FC<VideoUploadProps> = () => {
                   </h5>
                   <p className="text-gray-200 leading-relaxed text-sm sm:text-base">{analysisResults.feedback}</p>
                 </div>
+
+                {/* Badges Unlocked */}
+                {analysisResults.badgesUnlocked && analysisResults.badgesUnlocked.length > 0 && (
+                  <div className="bg-gradient-to-r from-yellow-600/20 to-purple-600/20 rounded-lg p-3 mb-3 border border-yellow-500/30">
+                    <h5 className="text-white font-bold mb-2 flex items-center">
+                      <Trophy className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400 mr-2" />
+                      Badges Unlocked! 🎉
+                    </h5>
+                    <div className="flex flex-wrap gap-2">
+                      {analysisResults.badgesUnlocked.map((badge: any) => (
+                        <div key={badge.id} className="flex items-center space-x-2 bg-gray-800 rounded-lg px-2 py-1">
+                          <span className="text-lg">{badge.icon}</span>
+                          <span className="text-yellow-400 font-medium text-xs sm:text-sm">{badge.name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 <div className="flex justify-center gap-2 text-center">
                   <div className="bg-yellow-600/20 rounded-lg px-2 sm:px-3 py-1 sm:py-2 flex items-center justify-center space-x-1">

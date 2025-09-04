@@ -91,15 +91,15 @@ const Challenges: React.FC = () => {
   const handleChallengeUpdate = (challenge: any) => {
     // Special case for Distance Destroyer - direct coin reward
     if (challenge.id === 'weekly-run' || challenge.title === 'Distance Destroyer') {
-      const coinsEarned = 25;
-      const xpEarned = 30;
+      const progressIncrement = 1; // 1km increment
+      const result = updateProgress(challenge.id, challenge.progress + progressIncrement);
+      
       if (user) {
         updateUser({
-          coins: (user.coins || 0) + coinsEarned,
-          xp: (user.xp || 0) + xpEarned
+          coins: (user.coins || 0) + 25, // Immediate reward for updating progress
+          xp: (user.xp || 0) + 30
         });
       }
-      updateProgress(challenge.id, Math.min(challenge.progress + 1, challenge.maxProgress));
       return;
     }
 
